@@ -391,3 +391,7 @@ Planned features:
 ---
 
 **This is a research tool for computational biology!**
+
+
+---
+*Built with AI assistance from [Claude (Anthropic)](https://claude.com/).*
