@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "receptor_finder"
+abstract: "A computational toolkit for discovering candidate InsP₃ and cADPR receptors in plant genomes through convergent evolution analysis."
+authors:
+  - family-names: Dickinson
+    given-names: "George D."
+    orcid: https://orcid.org/0000-0001-7711-0388
+    affiliation: University of California, Irvine
+repository-code: "https://github.com/gddickinson/receptor_finder"
+url: "https://github.com/gddickinson/receptor_finder"
+license: MIT
+date-released: 2026-01-01
