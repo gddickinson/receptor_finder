@@ -447,9 +447,16 @@ class CandidateRanker:
         """
         if by_score == "total":
             return sorted(self.candidates, key=lambda x: x.total_score, reverse=True)
+        # Accept a field name ('structure_quality', 'tissue_specificity') or
+        # the short form of a *_score field ('pocket' -> 'pocket_score').
+        fields = CandidateScore.__dataclass_fields__
+        if by_score in fields and by_score != "protein_id":
+            attr = by_score
+        elif f"{by_score}_score" in fields:
+            attr = f"{by_score}_score"
         else:
-            return sorted(self.candidates, key=lambda x: getattr(x, f"{by_score}_score", 0), 
-                        reverse=True)
+            raise ValueError(f"Unknown score field: {by_score!r}")
+        return sorted(self.candidates, key=lambda x: getattr(x, attr), reverse=True)
     
     def get_high_priority(self, threshold: float = 60.0) -> List[CandidateScore]:
         """Get high-priority candidates."""
