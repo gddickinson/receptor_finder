@@ -203,7 +203,10 @@ class MotifScanner:
         'Walker_B': r'[RK].{2,4}[LIVM].{2,4}D',
         
         # Ca2+ binding
-        'EF_hand': r'D.{2}[DNS]...[DNS].{2}[EQ]',
+        # PROSITE PS00018 (EF_HAND_1), pattern copied from the entry:
+        # D-{W}-[DNS]-{ILVFYW}-[DENSTG]-[DNQGHRK]-{GP}-[LIVMC]-[DENQSTAGC]-x(2)-[DE]-[LIVMFYW]
+        # (https://prosite.expasy.org/PS00018, retrieved 2026-11-12)
+        'EF_hand': r'D[^W][DNS][^ILVFYW][DENSTG][DNQGHRK][^GP][LIVMC][DENQSTAGC].{2}[DE][LIVMFYW]',
         'Acidic_cluster': r'[DE]{3,5}',  # Multiple acidic residues
         
         # Phosphate binding

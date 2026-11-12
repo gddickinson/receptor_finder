@@ -22,8 +22,8 @@ route('home', async () => {
       placeholders, and the docking and pocket-detection steps return mock values. This site therefore shows the
       method and the parts that are real code (the sequence filters, motif scanning and the scoring rules) running
       ${isStatic() ? 'in your browser' : 'in Python'}, plus an <a href="#/audit">audit</a> of what the rules can and
-      cannot detect: for example, the shipped EF-hand pattern finds ${au.ef_hand.detected} of the
-      ${au.ef_hand.loops.length} calmodulin EF-hand loops in the example data.</div>
+      cannot detect: for example, the EF-hand motif (PROSITE PS00018) finds ${au.ef_hand.detected} of the
+      ${au.ef_hand.loops.length} calmodulin EF-hand loops in the example data and none of the mutated decoys.</div>
     <div class="grid">
       <a class="card" href="#/method"><b>Method</b><span>The five phases, what each needs, and which parts are implemented or placeholders.</span></a>
       <a class="card" href="#/sequence"><b>Sequence filter</b><span>Paste FASTA: hydropathy profile, predicted TM segments, motif hits and the length / TM-count filter.</span></a>

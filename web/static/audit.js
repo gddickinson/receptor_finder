@@ -20,15 +20,18 @@ route('audit', async () => {
 
     <h2>1 · EF-hand motif against calmodulin's loops</h2>
     <p>Positive set: the four 12-residue Ca²⁺-binding loops in example sequence AT2G23456, whose first ~130 residues
-      reproduce calmodulin's EF-hand region. The shipped pattern <code>${esc(ef.pattern)}</code> places its conserved
-      positions at 1, 4, 8 and 11; the canonical loop has its Ca²⁺ ligands at 1, 3, 5, 7, 9 and 12.</p>
-    <div class="scroll"><table><thead><tr><th>Loop</th><th class="num">Position in AT2G23456</th><th>Shipped EF_hand pattern</th></tr></thead><tbody>
-      ${list(ef.loops, l => `<tr><td class="mono">${esc(l.loop)}</td><td class="num">${l.position}</td>
-        <td>${l.hits.length ? '<span class="badge ok">match</span>' : '<span class="badge no">no match</span>'}</td></tr>`)}</tbody></table></div>
-    <p class="callout"><b>${ef.detected} of ${ef.loops.length}</b> calmodulin EF-hand loops detected, and
-      ${ef.hits_in_AT2G23456.length} EF_hand hits in the whole of AT2G23456 (described in the FASTA as a “protein with
-      Ca²⁺ binding motifs”). The pattern cannot be used to find EF hands as written; a proposed correction is listed
-      in the project report for George to decide.</p>
+      reproduce calmodulin's EF-hand region. Decoys: the same loops with the position-1 Asp (a Ca²⁺ ligand) changed to
+      Ala. The motif is ${esc(ef.source)}, <code class="wrapcode">${esc(ef.pattern)}</code>: 13 positions, the loop plus
+      the hydrophobic residue after it.</p>
+    <div class="scroll"><table><thead><tr><th>Loop (+ next)</th><th class="num">Position</th><th>Loop</th><th>D1A decoy</th></tr></thead><tbody>
+      ${list(ef.loops, l => `<tr><td class="mono">${esc(l.loop)}<span class="mute">${esc(l.next)}</span></td><td class="num">${l.position}</td>
+        <td>${l.hit ? '<span class="badge ok">match</span>' : '<span class="badge no">no match</span>'}</td>
+        <td>${l.d1a_mutant_hit ? '<span class="badge no">match</span>' : '<span class="badge ok">rejected</span>'}</td></tr>`)}</tbody></table></div>
+    <p class="callout"><b>${ef.detected} of ${ef.loops.length}</b> loops found and ${ef.decoys_detected} of
+      ${ef.loops.length} decoys matched. What the pattern cannot do: it reads sequence only, so it cannot tell a
+      Ca²⁺-binding EF hand from a degenerate one that has lost binding, and it misses non-canonical loops (for
+      example the 14-residue S100 pseudo-EF-hand). The earlier pattern, <code>D.{2}[DNS]...[DNS].{2}[EQ]</code>,
+      found none of these loops.</p>
 
     <h2>2 · Shortest hydrophobic stretch called a TM segment</h2>
     <p>Construct: <code>${esc(tm.construct)}</code> (poly-Leu, the most hydrophobic common helix, between Lys flanks), run

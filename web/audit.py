@@ -14,11 +14,20 @@ EF_LOOPS = ["DKDGDGTITTKE", "DADGNGTIDFPE", "DKDGNGYISAAE", "DIDGDGQVNYEE"]
 
 
 def ef_hand():
+    """Scan all of AT2G23456 (the PS00018 pattern spans 13 residues: the 12-residue loop plus one hydrophobic residue),
+    then check each known loop start is among the hits. Decoy: each loop with its position-1 Asp mutated to Ala."""
     seq = read_fasta(str(repo_data.EXAMPLE_FASTA))["AT2G23456"]
     pat = MotifScanner.MOTIFS["EF_hand"]
-    loops = [{"loop": lp, "position": seq.find(lp), "hits": MotifScanner.scan_sequence(lp, pat)} for lp in EF_LOOPS]
-    return {"pattern": pat, "loops": loops, "detected": sum(bool(x["hits"]) for x in loops),
-            "hits_in_AT2G23456": MotifScanner.scan_sequence(seq, pat)}
+    hits = MotifScanner.scan_sequence(seq, pat)
+    loops = []
+    for lp in EF_LOOPS:
+        pos = seq.find(lp)
+        mutant = seq[:pos] + "A" + seq[pos + 1:]
+        loops.append({"loop": lp, "next": seq[pos + 12], "position": pos, "hit": pos in hits,
+                      "d1a_mutant_hit": pos in MotifScanner.scan_sequence(mutant, pat)})
+    return {"pattern": pat, "source": "PROSITE PS00018 (EF_HAND_1)", "loops": loops,
+            "detected": sum(x["hit"] for x in loops), "decoys_detected": sum(x["d1a_mutant_hit"] for x in loops),
+            "hits_in_AT2G23456": hits}
 
 
 def tm_min_length(flank="K", core="L", flank_len=20):

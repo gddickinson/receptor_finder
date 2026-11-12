@@ -101,3 +101,24 @@ class TestDockingScoreDirection(unittest.TestCase):
         vals = [S.score_docking(a) for a in affs]
         self.assertTrue(all(0 <= v <= 10 for v in vals))
         self.assertTrue(all(a >= b for a, b in zip(vals, vals[1:])), "a better (more negative) affinity must not score lower")
+
+
+class TestEfHandProsite(unittest.TestCase):
+    """EF_hand is PROSITE PS00018 (EF_HAND_1) and finds calmodulin's four Ca2+-binding loops."""
+
+    LOOPS = ["DKDGDGTITTKE", "DADGNGTIDFPE", "DKDGNGYISAAE", "DIDGDGQVNYEE"]
+
+    def _cam(self):
+        from utils import read_fasta
+        return read_fasta(str(Path(__file__).resolve().parent.parent / "data" / "example_sequences.fasta"))["AT2G23456"]
+
+    def test_all_four_calmodulin_loops(self):
+        from sequence_analysis import MotifScanner
+        seq = self._cam()
+        hits = MotifScanner.scan_sequence(seq, MotifScanner.MOTIFS["EF_hand"])
+        self.assertEqual(hits, [seq.find(lp) for lp in self.LOOPS])
+
+    def test_loop_without_first_aspartate_is_rejected(self):
+        from sequence_analysis import MotifScanner
+        seq = self._cam().replace("DKDGDGTITTKEL", "AKDGDGTITTKEL")
+        self.assertEqual(len(MotifScanner.scan_sequence(seq, MotifScanner.MOTIFS["EF_hand"])), 3)
