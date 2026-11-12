@@ -157,3 +157,45 @@ class TestKyteDoolittleRule(unittest.TestCase):
     def test_old_rule_still_available(self):
         seq = "K" * 20 + "L" * 20 + "K" * 20
         self.assertEqual(TransmembraneDomainPredictor.predict_tm_domains(seq, min_windows=15), [])
+
+
+class TestPhylogeneticPatterns(unittest.TestCase):
+    """classify_distribution returns every documented pattern (docs/in_silico_calcium_projects.md, section 3.1)."""
+
+    SPECIES = ["Arabidopsis_thaliana", "Oryza_sativa", "Zea_mays", "Marchantia_polymorpha", "Physcomitrella_patens",
+               "Chlamydomonas_reinhardtii", "Selaginella_moellendorffii", "Amborella_trichopoda"]
+
+    def _p(self, *present):
+        from phylogenetics import classify_distribution
+        return classify_distribution("G", {s: s in present for s in self.SPECIES}).pattern
+
+    def test_conserved(self):
+        self.assertEqual(self._p(*self.SPECIES), "Conserved")
+
+    def test_chlamydomonas_loss(self):
+        # present in the alga, absent from early land plants, present in angiosperms
+        self.assertEqual(self._p("Chlamydomonas_reinhardtii", "Arabidopsis_thaliana", "Oryza_sativa"), "Chlamydomonas_loss")
+
+    def test_land_plant_innovation(self):
+        self.assertEqual(self._p("Marchantia_polymorpha", "Physcomitrella_patens", "Selaginella_moellendorffii",
+                                 "Arabidopsis_thaliana", "Zea_mays"), "Land_plant_innovation")
+
+    def test_angiosperm_specific(self):
+        self.assertEqual(self._p("Arabidopsis_thaliana", "Oryza_sativa", "Amborella_trichopoda"), "Angiosperm_specific")
+
+    def test_bryophyte_origin(self):
+        self.assertEqual(self._p("Marchantia_polymorpha", "Physcomitrella_patens"), "Bryophyte_origin")
+
+    def test_sporadic(self):
+        self.assertEqual(self._p("Chlamydomonas_reinhardtii", "Marchantia_polymorpha"), "Sporadic")
+
+    def test_unknown_when_absent_everywhere(self):
+        self.assertEqual(self._p(), "Unknown")
+
+    def test_every_pattern_is_reachable_and_scored(self):
+        from itertools import product
+        from phylogenetics import classify_distribution
+        from scoring import EvolutionaryScorer
+        seen = {classify_distribution("G", dict(zip(self.SPECIES, bits))).pattern
+                for bits in product([False, True], repeat=len(self.SPECIES))}
+        self.assertEqual(seen, set(EvolutionaryScorer.PATTERN_SCORES))

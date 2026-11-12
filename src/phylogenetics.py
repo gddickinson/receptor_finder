@@ -66,6 +66,25 @@ def classify_distribution(gene_id: str,
     """
     Classify a gene's phylogenetic distribution pattern.
 
+    Patterns follow docs/in_silico_calcium_projects.md (section 3.1) and
+    the names scored in scoring.EvolutionaryScorer:
+
+    - Conserved: in the alga and in angiosperms and early land plants
+      (bryophytes or the lycophyte).
+    - Chlamydomonas_loss: in the alga (which has a canonical InsP3R), absent
+      from early land plants, present in angiosperms ("present in algae,
+      lost in land plants, re-expanded in angiosperms").
+    - Land_plant_innovation: absent from the alga, present in bryophytes
+      and angiosperms ("absent in algae, appeared in bryophytes, conserved
+      in all land plants").
+    - Angiosperm_specific: present only in flowering plants.
+    - Bryophyte_origin: in bryophytes, absent from the alga and angiosperms.
+    - Sporadic: present somewhere but in none of the patterns above.
+    - Unknown: absent from every species sampled.
+
+    Presence/absence alone cannot separate a loss from a gain; the labels
+    are hypotheses to test with a gene tree.
+
     Parameters
     ----------
     gene_id : str
@@ -81,45 +100,30 @@ def classify_distribution(gene_id: str,
     present = [sp for sp, val in presence.items() if val]
     absent = [sp for sp, val in presence.items() if not val]
 
-    has_chlamy = presence.get("Chlamydomonas_reinhardtii", False)
-    has_land = any(
-        presence.get(sp, False)
-        for sp, info in PLANT_SPECIES.items()
-        if info["group"] == "Land_plants"
-    )
-    has_bryophyte = any(
-        presence.get(sp, False)
-        for sp, info in PLANT_SPECIES.items()
-        if info["clade"] == "Bryophytes"
-    )
-    has_angiosperm = any(
-        presence.get(sp, False)
-        for sp, info in PLANT_SPECIES.items()
-        if info["clade"] in ("Eudicots", "Monocots", "Basal_angiosperm")
-    )
+    def _any(clades):
+        return any(presence.get(sp, False) for sp, info in PLANT_SPECIES.items()
+                   if info["clade"] in clades)
 
-    # Determine pattern
-    if has_land and not has_chlamy:
-        pattern = "Chlamydomonas_loss"
-        confidence = 0.9
-    elif has_land and has_chlamy:
-        pattern = "Conserved"
-        confidence = 0.8
-    elif has_angiosperm and not has_bryophyte:
-        pattern = "Angiosperm_specific"
-        confidence = 0.7
-    elif has_bryophyte and has_angiosperm:
-        pattern = "Land_plant_innovation"
-        confidence = 0.8
-    elif has_bryophyte and not has_angiosperm:
-        pattern = "Bryophyte_origin"
-        confidence = 0.6
-    elif len(present) <= 1:
-        pattern = "Sporadic"
-        confidence = 0.5
+    has_chlamy = presence.get("Chlamydomonas_reinhardtii", False)
+    has_bryophyte = _any(("Bryophytes",))
+    has_lycophyte = _any(("Lycophytes",))
+    has_angiosperm = _any(("Eudicots", "Monocots", "Basal_angiosperm"))
+    has_early_land = has_bryophyte or has_lycophyte
+
+    if not present:
+        pattern, confidence = "Unknown", 0.0
+    elif has_chlamy and has_angiosperm and has_early_land:
+        pattern, confidence = "Conserved", 0.8
+    elif has_chlamy and has_angiosperm:
+        pattern, confidence = "Chlamydomonas_loss", 0.9
+    elif not has_chlamy and has_bryophyte and has_angiosperm:
+        pattern, confidence = "Land_plant_innovation", 0.8
+    elif has_angiosperm and not has_chlamy and not has_early_land:
+        pattern, confidence = "Angiosperm_specific", 0.7
+    elif has_bryophyte and not has_chlamy and not has_angiosperm:
+        pattern, confidence = "Bryophyte_origin", 0.6
     else:
-        pattern = "Unknown"
-        confidence = 0.0
+        pattern, confidence = "Sporadic", 0.5
 
     return PhylogeneticPattern(
         gene_id=gene_id,

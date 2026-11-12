@@ -84,8 +84,8 @@ async function update() {
   const presence = Object.fromEntries($$('#app input[id^="sp-"]').map(el => [el.id.slice(3), el.checked]));
   const ph = S.classifyDistribution(presence);
   $('#phres').innerHTML = `<h3>Pattern</h3><p><b class="mono">${esc(ph.pattern)}</b> · confidence ${ph.confidence} ·
-    ${S.scorePhyloPattern(ph.pattern)} / 10 points</p><p class="small mute">Only three patterns are reachable with the
-    current branch order: see the <a href="#/audit">audit</a>.</p>`;
+    ${S.scorePhyloPattern(ph.pattern)} / 10 points</p><p class="small mute">Patterns as defined in docs/in_silico_calcium_projects.md
+    (section 3.1). Presence alone cannot tell a loss from a gain: confirm with a gene tree.</p>`;
 
   const d = S.dockingSpecificity(n('d3'), n('d4'));
   $('#dres').innerHTML = `<h3>Specificity</h3><p>ΔG(InsP₄) − ΔG(InsP₃) = <b class="mono">${fmt(d.delta_affinity)}</b> kcal/mol ·

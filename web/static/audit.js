@@ -59,10 +59,12 @@ route('audit', async () => {
     <h2>4 · Phylogenetic patterns the classifier can return</h2>
     <p>classify_distribution run on all ${ph.combinations} presence/absence combinations of its 8 species:</p>
     <p>${list(Object.entries(ph.counts), ([k, v]) => `<span class="tag a">${esc(k)}: ${v}</span>`)}</p>
-    <p class="callout">Never returned: ${list(ph.never_returned, k => `<span class="tag b">${esc(k)}</span>`)}. Any land
-      plant presence is caught by the first two branches (Chlamydomonas_loss / Conserved), so the angiosperm- and
-      bryophyte-specific branches below them cannot be reached, and a family absent from every species is called
-      “Sporadic”. The right branch order is a scientific choice, left for George.</p>
+    <p class="callout">${ph.never_returned.length ? `Never returned: ${list(ph.never_returned, k => `<span class="tag b">${esc(k)}</span>`)}.`
+      : `All ${Object.keys(ph.counts).length} documented patterns are reachable.`} The patterns follow the definitions in
+      docs/in_silico_calcium_projects.md (section 3.1). What the classifier cannot do: presence/absence across 8 species
+      cannot separate a loss from a gain or detect re-expansion (copy number); those need a gene tree. An earlier
+      version could return only Chlamydomonas_loss, Conserved and Sporadic, and gave “Chlamydomonas_loss” to families
+      absent from the alga, the opposite of the documented definition.</p>
 
     <h2>5 · Ligand library (docking.py)</h2>
     <p>Phosphorus atoms counted in each SMILES string against the phosphate groups the named ligand has.</p>

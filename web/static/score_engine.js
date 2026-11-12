@@ -128,18 +128,19 @@ export function pocketSpecificity(insp3, cadpr, insp4 = null) {
 }
 
 // --- phylogenetics.py ------------------------------------------------------------------------------------------------
+// Patterns as documented in docs/in_silico_calcium_projects.md section 3.1 (see the Python docstring).
 export function classifyDistribution(presence) {
   const present = Object.keys(presence).filter(k => presence[k]);
-  const any = test => Object.entries(PLANT_SPECIES).some(([sp, [clade, group]]) => test(clade, group) && presence[sp]);
-  const chlamy = !!presence.Chlamydomonas_reinhardtii, land = any((c, g) => g === 'Land_plants'),
-    bryo = any(c => c === 'Bryophytes'), angio = any(c => ['Eudicots', 'Monocots', 'Basal_angiosperm'].includes(c));
-  if (land && !chlamy) return { pattern: 'Chlamydomonas_loss', confidence: 0.9 };
-  if (land && chlamy) return { pattern: 'Conserved', confidence: 0.8 };
-  if (angio && !bryo) return { pattern: 'Angiosperm_specific', confidence: 0.7 };
-  if (bryo && angio) return { pattern: 'Land_plant_innovation', confidence: 0.8 };
-  if (bryo && !angio) return { pattern: 'Bryophyte_origin', confidence: 0.6 };
-  if (present.length <= 1) return { pattern: 'Sporadic', confidence: 0.5 };
-  return { pattern: 'Unknown', confidence: 0 };
+  const any = clades => Object.entries(PLANT_SPECIES).some(([sp, [clade]]) => clades.includes(clade) && presence[sp]);
+  const chlamy = !!presence.Chlamydomonas_reinhardtii, bryo = any(['Bryophytes']), lyco = any(['Lycophytes']),
+    angio = any(['Eudicots', 'Monocots', 'Basal_angiosperm']), early = bryo || lyco;
+  if (!present.length) return { pattern: 'Unknown', confidence: 0 };
+  if (chlamy && angio && early) return { pattern: 'Conserved', confidence: 0.8 };
+  if (chlamy && angio) return { pattern: 'Chlamydomonas_loss', confidence: 0.9 };
+  if (!chlamy && bryo && angio) return { pattern: 'Land_plant_innovation', confidence: 0.8 };
+  if (angio && !chlamy && !early) return { pattern: 'Angiosperm_specific', confidence: 0.7 };
+  if (bryo && !chlamy && !angio) return { pattern: 'Bryophyte_origin', confidence: 0.6 };
+  return { pattern: 'Sporadic', confidence: 0.5 };
 }
 
 // --- docking.py ------------------------------------------------------------------------------------------------------

@@ -97,7 +97,7 @@ def test_audit_numbers():
     assert a["ef_hand"]["detected"] == 4 and a["ef_hand"]["decoys_detected"] == 0
     assert a["tm_min_length"]["shortest_detected"] == 14
     assert a["tm_benchmark"]["found"] == 13 and a["tm_benchmark"]["annotated"] == 16
-    assert set(a["phylo"]["never_returned"]) == {"Angiosperm_specific", "Land_plant_innovation", "Bryophyte_origin", "Unknown"}
+    assert a["phylo"]["never_returned"] == [] and len(a["phylo"]["counts"]) == 7
     lig = {x["name"]: x for x in a["ligands"]}
     assert lig["InsP3"]["phosphorus"] == 4 and lig["NAD"]["notes"] == []
 
