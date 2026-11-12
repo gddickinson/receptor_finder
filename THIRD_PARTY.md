@@ -3,18 +3,75 @@
 Data and definitions copied from outside sources. Each was retrieved once by hand; no code or test in this repository
 contacts these services.
 
-## PROSITE PS00018 (EF_HAND_1): EF-hand motif
-- Used as `MotifScanner.MOTIFS['EF_hand']` (src/sequence_analysis.py) and in web/static/seq_engine.js.
-- Pattern, copied from the entry:
-  `D-{W}-[DNS]-{ILVFYW}-[DENSTG]-[DNQGHRK]-{GP}-[LIVMC]-[DENQSTAGC]-x(2)-[DE]-[LIVMFYW]`.
-- Source: https://prosite.expasy.org/PS00018 (entry dated 29-MAY-2024 INFO UPDATE), retrieved 2026-11-12.
-- Licence: PROSITE is distributed under CC BY-NC-ND 4.0 (SIB), https://prosite.expasy.org/prosite_license.html; only the pattern string is reproduced here, with attribution.
+## EF-hand loop motif (`MotifScanner.MOTIFS['EF_hand']`, src/sequence_analysis.py, and web/static/seq_engine.js)
+Pattern, written for this repository: `D.[DENQST].[DENQST]G.{5}[DE]`, one 12-residue canonical EF-hand Ca2+-binding loop.
+
+| Loop position | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Ca2+ ligand | X | | Y | | Z | | -Y | | -X | | | -Z |
+| Pattern | D | any | D E N Q S T | any | D E N Q S T | G | any | any | any | any | any | D E |
+
+Why each position (facts from the sources below; the regex itself is ours):
+- A 12-residue loop whose Ca2+ ligands are at positions 1, 3, 5, 7, 9 and 12 (X, Y, Z, -Y, -X, -Z), with an invariant
+  Glu or Asp at 12 giving two oxygens (bidentate): InterPro IPR002048 "EF-hand domain" description (InterPro data are
+  CC0); Mazumder M et al. (2014) *PLoS ONE* 9:e96202, doi:10.1371/journal.pone.0096202.
+- Asp at 1 (X) and the Gly at 6 that makes the sharp turn around the ion, "typically a highly invariant Gly": Lin Q-T
+  et al. (2021) *Protein Sci.* 30:855-872, doi:10.1002/pro.4042 (which also notes Asp at 1 and 5 and Glu at 12 as
+  typical of canonical loops).
+- Positions 3 and 5 bind through side-chain oxygens, so they are limited to the six residues with oxygen side chains
+  (D, E, N, Q, S, T). Position 7 binds through its backbone carbonyl and 9 through a water molecule, so neither is
+  restricted (parvalbumin's second loop has Gly at 9).
+- Background: the EF-hand was defined in carp parvalbumin by Kretsinger RH, Nockolds CE (1973) *J. Biol. Chem.*
+  248:3313-3326, doi:10.1016/S0021-9258(19)44043-X; canonical versus pseudo EF-hands are reviewed by Gifford JL, Walsh
+  MP, Vogel HJ (2007) *Biochem. J.* 405:199-221, doi:10.1042/BJ20070255. I could not open the full text of either
+  (publisher pages refused automated access), so no position rule above rests on them alone.
+- All DOIs checked on Crossref, 2026-11-12.
+
+Benchmark (tests/test_regressions.py, `TestEfHandLoop`, and the Audit page):
+- The four calmodulin loops in example AT2G23456 are found, and none of their D1A mutants matches. Residues 5-133 of
+  AT2G23456 are identical to residues 21-149 of human calmodulin (UniProt P0DP23).
+- 6 UniProt-annotated EF-hand proteins plus myoglobin (`tests/fixtures/uniprot_efhand_benchmark.json`):
+  - all 13 loops with annotated Ca2+ ligands at positions 1, 3, 5 and 12 are found, with no other hit;
+  - none of the 5 EF-hand domains that do not bind Ca2+ this way is hit (S100B and S100G pseudo-EF-hands, cardiac
+    troponin C site I, recoverin EF1 and EF4).
+  - The PROSITE pattern used before found 12 of the 13: it missed recoverin's EF2 loop (DSNLDGTLDFKE), which has Leu
+    at position 4.
+- It is less specific than PROSITE's pattern on random sequence: about 23 hits per million uniformly random residues,
+  against about 1 for PROSITE's.
+
+### Why not PROSITE PS00018 (decision, 2026-11-12)
+From 2026-11-12 (commit e756dc6) until this change, the motif was PROSITE PS00018 (EF_HAND_1), copied from
+prosite.expasy.org. It was replaced because its licence is not compatible with this repository's MIT licence:
+- The PROSITE licence page (https://prosite.expasy.org/prosite_license.html) and the header of the data file
+  `prosite.dat` (release 2026_04, 04-Nov-2026) both say that PROSITE "is copyrighted by the SIB Swiss Institute of
+  Bioinformatics and distributed under the Creative Commons Attribution-NonCommercial-NoDerivatives (CC BY-NC-ND 4.0)
+  License". The licence covers the whole database, patterns included, not only the documentation.
+- The licence page also says that commercial users must pay a yearly licence fee, "irrespective of the method by which
+  they access the database". Only "reference to or printing of the documentation part of PROSITE entries (within
+  reason)" is allowed in publications, and educational use is exempt.
+- The SIB/Expasy Terms of Use (https://www.expasy.org/terms-of-use) add no restriction of their own but defer to each
+  resource's licence. So PROSITE's CC BY-NC-ND applies, unlike UniProt (also SIB, with EMBL-EBI and PIR), which is
+  CC BY 4.0. All three pages were read on 2026-11-12.
+- Under the MIT licence anyone may reuse this code commercially and modify it. A copied PROSITE pattern would carry
+  NC and ND terms that MIT cannot pass on, and turning it into a regex is itself an adaptation. Attribution alone
+  does not fix either conflict, so the pattern was removed rather than relicensed.
+- The pattern now used is written from facts about the EF-hand loop reported in the literature. It does not copy
+  PROSITE, and it is a different pattern: 12 positions instead of 13, with different residue sets. PROSITE is no longer
+  used anywhere in the code, the tests or the static site. The test `test_not_the_prosite_pattern` guards against it
+  coming back.
 
 ## Kyte & Doolittle hydropathy: TM prediction
 - Kyte J, Doolittle RF (1982). A simple method for displaying the hydropathic character of a protein.
   *J. Mol. Biol.* 157(1):105-132. doi:10.1016/0022-2836(82)90515-0 (DOI checked on Crossref, 2026-11-12).
 - Used for the hydropathy scale and the rule in `TransmembraneDomainPredictor.predict_tm_domains`: a 19-residue
   window with mean hydropathy >= 1.6 marks a probable membrane-spanning segment.
+
+## UniProtKB: EF-hand benchmark proteins
+- `tests/fixtures/uniprot_efhand_benchmark.json`: sequences, EF-hand "Domain" features and Ca2+ "Binding site" features
+  of P0DP23 (CALM1_HUMAN), P63316 (TNNC1_HUMAN), P20472 (PRVA_HUMAN), P04271 (S100B_HUMAN), P35243 (RECO_HUMAN),
+  P29377 (S100G_HUMAN), and P02144 (MYG_HUMAN) as a decoy.
+- Source: UniProtKB REST API (https://rest.uniprot.org/uniprotkb/<accession>.json), retrieved 2026-11-12.
+- Licence: CC BY 4.0 (https://www.uniprot.org/help/license).
 
 ## UniProtKB: TM benchmark proteins
 - `tests/fixtures/uniprot_tm_benchmark.json`: sequences and "Transmembrane" features of P02724 (GLPA_HUMAN),

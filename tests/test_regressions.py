@@ -103,8 +103,8 @@ class TestDockingScoreDirection(unittest.TestCase):
         self.assertTrue(all(a >= b for a, b in zip(vals, vals[1:])), "a better (more negative) affinity must not score lower")
 
 
-class TestEfHandProsite(unittest.TestCase):
-    """EF_hand is PROSITE PS00018 (EF_HAND_1) and finds calmodulin's four Ca2+-binding loops."""
+class TestEfHandLoop(unittest.TestCase):
+    """EF_hand is the canonical 12-residue EF-hand loop (THIRD_PARTY.md) and finds calmodulin's four Ca2+-binding loops."""
 
     LOOPS = ["DKDGDGTITTKE", "DADGNGTIDFPE", "DKDGNGYISAAE", "DIDGDGQVNYEE"]
 
@@ -122,6 +122,28 @@ class TestEfHandProsite(unittest.TestCase):
         from sequence_analysis import MotifScanner
         seq = self._cam().replace("DKDGDGTITTKEL", "AKDGDGTITTKEL")
         self.assertEqual(len(MotifScanner.scan_sequence(seq, MotifScanner.MOTIFS["EF_hand"])), 3)
+
+
+    def test_uniprot_annotated_loops(self):
+        """Every loop with UniProt Ca2+ ligands at positions 1, 3, 5 and 12 is found, and nothing else is hit (S100
+        pseudo-EF-hands, troponin C site I, recoverin EF1/EF4 and myoglobin included)."""
+        import json
+        from sequence_analysis import MotifScanner
+        bench = json.loads((Path(__file__).resolve().parent / "fixtures" / "uniprot_efhand_benchmark.json").read_text())
+        for e in bench["entries"]:
+            ca = set(e["ca_binding_residues"])
+            loops = sorted(s for s in ca if {s, s + 2, s + 4, s + 11} <= ca)
+            hits = [h + 1 for h in MotifScanner.scan_sequence(e["sequence"], MotifScanner.MOTIFS["EF_hand"])]
+            self.assertEqual(hits, loops, e["id"])
+
+    def test_not_the_prosite_pattern(self):
+        """PROSITE is CC BY-NC-ND 4.0, which an MIT repo cannot carry: the loop is defined from the literature."""
+        from sequence_analysis import MotifScanner
+        js = (Path(__file__).resolve().parent.parent / "web" / "static" / "seq_engine.js").read_text()
+        for text in (MotifScanner.MOTIFS["EF_hand"], js):
+            self.assertNotIn("[DNQGHRK]", text)
+            self.assertNotIn("[^ILVFYW]", text)
+        self.assertIn("EF_hand: '" + MotifScanner.MOTIFS["EF_hand"] + "'", js)
 
 
 class TestKyteDoolittleRule(unittest.TestCase):

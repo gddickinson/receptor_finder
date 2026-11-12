@@ -204,6 +204,10 @@ class SequenceFilter:
         return filtered
 
 
+# Canonical EF-hand loop, positions 1-12 (see MotifScanner.MOTIFS['EF_hand']).
+EF_HAND_LOOP = r'D.[DENQST].[DENQST]G.{5}[DE]'
+
+
 class MotifScanner:
     """Scan for specific sequence motifs."""
     
@@ -214,10 +218,11 @@ class MotifScanner:
         'Walker_B': r'[RK].{2,4}[LIVM].{2,4}D',
         
         # Ca2+ binding
-        # PROSITE PS00018 (EF_HAND_1), pattern copied from the entry:
-        # D-{W}-[DNS]-{ILVFYW}-[DENSTG]-[DNQGHRK]-{GP}-[LIVMC]-[DENQSTAGC]-x(2)-[DE]-[LIVMFYW]
-        # (https://prosite.expasy.org/PS00018, retrieved 2026-11-12)
-        'EF_hand': r'D[^W][DNS][^ILVFYW][DENSTG][DNQGHRK][^GP][LIVMC][DENQSTAGC].{2}[DE][LIVMFYW]',
+        # Canonical 12-residue EF-hand Ca2+-binding loop (Kretsinger & Nockolds 1973; Gifford et al. 2007),
+        # written for this repo from the loop's definition (sources in THIRD_PARTY.md): Ca2+ ligands at
+        # positions 1, 3, 5, 7, 9, 12; Asp at 1; side-chain oxygen ligands at 3 and 5; Gly at 6 (the turn);
+        # 7 (backbone carbonyl) and 9 (via water) unconstrained; Glu or Asp (bidentate) at 12.
+        'EF_hand': EF_HAND_LOOP,
         'Acidic_cluster': r'[DE]{3,5}',  # Multiple acidic residues
         
         # Phosphate binding

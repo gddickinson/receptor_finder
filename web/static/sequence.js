@@ -75,7 +75,7 @@ function show() {
       <p class="small mute mono wrapcode">${esc(MOTIFS[state.motif])} · ${pick.motifs[state.motif].length} non-overlapping matches at
         ${esc(pick.motifs[state.motif].slice(0, 30).join(', ') || '-')}${pick.motifs[state.motif].length > 30 ? ' ...' : ''}</p>
       ${residueMap(seq, pick.tm, MOTIFS[state.motif])}
-      ${state.motif === 'EF_hand' ? '<p class="small mute">EF_hand is the PROSITE PS00018 pattern (13 residues: the Ca²⁺-binding loop plus one hydrophobic residue); benchmark on the <a href="#/audit">audit</a> page.</p>' : ''}
+      ${state.motif === 'EF_hand' ? '<p class="small mute">EF_hand is the canonical 12-residue Ca²⁺-binding loop (Asp at 1, O-ligands at 3 and 5, Gly at 6, Glu/Asp at 12); benchmark on the <a href="#/audit">audit</a> page.</p>' : ''}
     </div>`;
   document.querySelectorAll('tr.click').forEach(tr => {
     const go = () => { state.pick = +tr.dataset.i; show(); };

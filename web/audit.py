@@ -14,8 +14,8 @@ EF_LOOPS = ["DKDGDGTITTKE", "DADGNGTIDFPE", "DKDGNGYISAAE", "DIDGDGQVNYEE"]
 
 
 def ef_hand():
-    """Scan all of AT2G23456 (the PS00018 pattern spans 13 residues: the 12-residue loop plus one hydrophobic residue),
-    then check each known loop start is among the hits. Decoy: each loop with its position-1 Asp mutated to Ala."""
+    """Scan all of AT2G23456, then check each known 12-residue loop start is among the hits. Decoy: each loop with its
+    position-1 Asp mutated to Ala. Also records which calmodulin (UniProt P0DP23) residues AT2G23456 reproduces."""
     seq = read_fasta(str(repo_data.EXAMPLE_FASTA))["AT2G23456"]
     pat = MotifScanner.MOTIFS["EF_hand"]
     hits = MotifScanner.scan_sequence(seq, pat)
@@ -25,9 +25,41 @@ def ef_hand():
         mutant = seq[:pos] + "A" + seq[pos + 1:]
         loops.append({"loop": lp, "next": seq[pos + 12], "position": pos, "hit": pos in hits,
                       "d1a_mutant_hit": pos in MotifScanner.scan_sequence(mutant, pat)})
-    return {"pattern": pat, "source": "PROSITE PS00018 (EF_HAND_1)", "loops": loops,
+    return {"pattern": pat, "source": "canonical 12-residue EF-hand loop (THIRD_PARTY.md)", "loops": loops,
             "detected": sum(x["hit"] for x in loops), "decoys_detected": sum(x["d1a_mutant_hit"] for x in loops),
-            "hits_in_AT2G23456": hits}
+            "hits_in_AT2G23456": hits, "calmodulin_match": calmodulin_match(seq)}
+
+
+def _efhand_bench():
+    import json
+    return json.loads((repo_data.ROOT / "tests" / "fixtures" / "uniprot_efhand_benchmark.json").read_text())
+
+
+def calmodulin_match(seq):
+    """Longest identical stretch between AT2G23456 and human calmodulin CALM1 (UniProt P0DP23), 1-based inclusive."""
+    from difflib import SequenceMatcher
+    cam = next(e for e in _efhand_bench()["entries"] if e["accession"] == "P0DP23")["sequence"]
+    m = max(SequenceMatcher(None, seq, cam, autojunk=False).get_matching_blocks(), key=lambda b: b.size)
+    return {"accession": "P0DP23", "length": m.size, "example_range": [m.a + 1, m.a + m.size],
+            "uniprot_range": [m.b + 1, m.b + m.size]}
+
+
+def ef_hand_benchmark():
+    """EF_hand on UniProt-annotated EF-hand proteins (tests/fixtures/uniprot_efhand_benchmark.json, fetched once).
+    An annotated canonical loop starts at s when residues s, s+2, s+4 and s+11 are all Ca2+ ligands in UniProt."""
+    bench = _efhand_bench()
+    pat = MotifScanner.MOTIFS["EF_hand"]
+    rows = []
+    for e in bench["entries"]:
+        ca = set(e["ca_binding_residues"])
+        loops = sorted(s for s in ca if {s, s + 2, s + 4, s + 11} <= ca)
+        hits = [h + 1 for h in MotifScanner.scan_sequence(e["sequence"], pat)]
+        rows.append({"accession": e["accession"], "id": e["id"], "name": e["name"], "length": len(e["sequence"]),
+                     "ef_hand_domains": len(e["ef_hand_domains"]), "annotated_loops": loops, "hits": hits,
+                     "found": len(set(hits) & set(loops)), "extra": len(set(hits) - set(loops))})
+    return {"source": bench["source"], "retrieved": bench["retrieved"], "rows": rows,
+            "found": sum(r["found"] for r in rows), "annotated": sum(len(r["annotated_loops"]) for r in rows),
+            "extra": sum(r["extra"] for r in rows), "ef_hand_domains": sum(r["ef_hand_domains"] for r in rows)}
 
 
 def tm_min_length(flank="K", core="L", flank_len=20):
@@ -82,6 +114,6 @@ def phylo_reachability():
 
 
 def benchmarks():
-    return {"ef_hand": ef_hand(), "tm_min_length": tm_min_length(), "tm_benchmark": tm_benchmark(),
+    return {"ef_hand": ef_hand(), "ef_hand_benchmark": ef_hand_benchmark(), "tm_min_length": tm_min_length(), "tm_benchmark": tm_benchmark(),
             "examples_tm": examples_tm(),
             "phylo": phylo_reachability(), "ligands": repo_data.ligands()}

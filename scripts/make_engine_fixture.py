@@ -38,6 +38,8 @@ def sequence_cases():
     seqs = dict(read_fasta(str(ROOT / "data" / "example_sequences.fasta")))
     bench = json.loads((ROOT / "tests" / "fixtures" / "uniprot_tm_benchmark.json").read_text())
     seqs.update({e["accession"]: e["sequence"] for e in bench["entries"]})
+    ef = json.loads((ROOT / "tests" / "fixtures" / "uniprot_efhand_benchmark.json").read_text())
+    seqs.update({e["accession"]: e["sequence"] for e in ef["entries"]})
     for n in (15, 20, 22, 23, 33, 40):
         seqs[f"polyL_{n}"] = "K" * 20 + "L" * n + "K" * 20
     seqs["two_close"] = "K" * 10 + "L" * 35 + "KK" + "L" * 35 + "K" * 10

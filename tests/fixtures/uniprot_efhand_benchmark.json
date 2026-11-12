@@ -1,0 +1,239 @@
+{
+ "source": "UniProtKB REST API, https://rest.uniprot.org/uniprotkb/<accession>.json",
+ "retrieved": "2026-11-12",
+ "licence": "UniProt data is CC BY 4.0 (https://www.uniprot.org/help/license)",
+ "note": "'ef_hand_domains' are UniProt 'Domain' features named EF-hand; 'ca_binding_residues' are 'Binding site' features whose ligand is Ca(2+) (1-based). A canonical Ca2+-binding loop starts at s when s, s+2, s+4 and s+11 are all annotated ligands. Myoglobin (P02144) is a soluble decoy without EF hands. Fetched once; tests never call the network.",
+ "entries": [
+  {
+   "accession": "P0DP23",
+   "id": "CALM1_HUMAN",
+   "name": "Calmodulin-1",
+   "ef_hand_domains": [
+    [
+     8,
+     43,
+     "EF-hand 1"
+    ],
+    [
+     44,
+     79,
+     "EF-hand 2"
+    ],
+    [
+     81,
+     116,
+     "EF-hand 3"
+    ],
+    [
+     117,
+     149,
+     "EF-hand 4"
+    ]
+   ],
+   "ca_binding_residues": [
+    21,
+    23,
+    25,
+    27,
+    32,
+    57,
+    59,
+    61,
+    63,
+    68,
+    94,
+    96,
+    98,
+    100,
+    105,
+    130,
+    132,
+    134,
+    136,
+    141
+   ],
+   "sequence": "MADQLTEEQIAEFKEAFSLFDKDGDGTITTKELGTVMRSLGQNPTEAELQDMINEVDADGNGTIDFPEFLTMMARKMKDTDSEEEIREAFRVFDKDGNGYISAAELRHVMTNLGEKLTDEEVDEMIREADIDGDGQVNYEEFVQMMTAK"
+  },
+  {
+   "accession": "P63316",
+   "id": "TNNC1_HUMAN",
+   "name": "Troponin C, slow skeletal and cardiac muscles",
+   "ef_hand_domains": [
+    [
+     16,
+     51,
+     "EF-hand 1"
+    ],
+    [
+     52,
+     87,
+     "EF-hand 2"
+    ],
+    [
+     92,
+     127,
+     "EF-hand 3"
+    ],
+    [
+     128,
+     161,
+     "EF-hand 4"
+    ]
+   ],
+   "ca_binding_residues": [
+    65,
+    67,
+    69,
+    71,
+    76,
+    105,
+    107,
+    109,
+    111,
+    116,
+    141,
+    143,
+    145,
+    147,
+    152
+   ],
+   "sequence": "MDDIYKAAVEQLTEEQKNEFKAAFDIFVLGAEDGCISTKELGKVMRMLGQNPTPEELQEMIDEVDEDGSGTVDFDEFLVMMVRCMKDDSKGKSEEELSDLFRMFDKNADGYIDLDELKIMLQATGETITEDDIEELMKDGDKNNDGRIDYDEFLEFMKGVE"
+  },
+  {
+   "accession": "P20472",
+   "id": "PRVA_HUMAN",
+   "name": "Parvalbumin alpha",
+   "ef_hand_domains": [
+    [
+     39,
+     74,
+     "EF-hand 1"
+    ],
+    [
+     78,
+     110,
+     "EF-hand 2"
+    ]
+   ],
+   "ca_binding_residues": [
+    52,
+    54,
+    56,
+    58,
+    60,
+    63,
+    91,
+    93,
+    95,
+    97,
+    102
+   ],
+   "sequence": "MSMTDLLNAEDIKKAVGAFSATDSFDHKKFFQMVGLKKKSADDVKKVFHMLDKDKSGFIEEDELGFILKGFSPDARDLSAKETKMLMAAGDKDGDGKIGVDEFSTLVAES"
+  },
+  {
+   "accession": "P04271",
+   "id": "S100B_HUMAN",
+   "name": "Protein S100-B",
+   "ef_hand_domains": [
+    [
+     13,
+     48,
+     "EF-hand 1"
+    ],
+    [
+     49,
+     84,
+     "EF-hand 2"
+    ]
+   ],
+   "ca_binding_residues": [
+    19,
+    22,
+    24,
+    27,
+    32,
+    62,
+    64,
+    66,
+    68,
+    73
+   ],
+   "sequence": "MSELEKAMVALIDVFHQYSGREGDKHKLKKSELKELINNELSHFLEEIKEQEVVDKVMETLDNDGDGECDFQEFMAFVAMVTTACHEFFEHE"
+  },
+  {
+   "accession": "P35243",
+   "id": "RECO_HUMAN",
+   "name": "Recoverin",
+   "ef_hand_domains": [
+    [
+     25,
+     60,
+     "EF-hand 1"
+    ],
+    [
+     61,
+     96,
+     "EF-hand 2"
+    ],
+    [
+     97,
+     132,
+     "EF-hand 3"
+    ],
+    [
+     147,
+     182,
+     "EF-hand 4"
+    ]
+   ],
+   "ca_binding_residues": [
+    74,
+    76,
+    78,
+    80,
+    85,
+    110,
+    112,
+    114,
+    116,
+    121
+   ],
+   "sequence": "MGNSKSGALSKEILEELQLNTKFSEEELCSWYQSFLKDCPTGRITQQQFQSIYAKFFPDTDPKAYAQHVFRSFDSNLDGTLDFKEYVIALHMTTAGKTNQKLEWAFSLYDVDGNGTISKNEVLEIVMAIFKMITPEDVKLLPDDENTPEKRAEKIWKYFGKNDDDKLTEKEFIEGTLANKEILRLIQFEPQKVKEKMKNA"
+  },
+  {
+   "accession": "P29377",
+   "id": "S100G_HUMAN",
+   "name": "Protein S100-G",
+   "ef_hand_domains": [
+    [
+     13,
+     48,
+     "EF-hand 1"
+    ],
+    [
+     45,
+     79,
+     "EF-hand 2"
+    ]
+   ],
+   "ca_binding_residues": [
+    26,
+    31,
+    58,
+    60,
+    62,
+    64,
+    69
+   ],
+   "sequence": "MSTKKSPEELKRIFEKYAAKEGDPDQLSKDELKLLIQAEFPSLLKGPNTLDDLFQELDKNGDGEVSFEEFQVLVKKISQ"
+  },
+  {
+   "accession": "P02144",
+   "id": "MYG_HUMAN",
+   "name": "Myoglobin",
+   "ef_hand_domains": [],
+   "ca_binding_residues": [],
+   "sequence": "MGLSDGEWQLVLNVWGKVEADIPGHGQEVLIRLFKGHPETLEKFDKFKHLKSEDEMKASEDLKKHGATVLTALGGILKKKGHHEAEIKPLAQSHATKHKIPVKYLEFISECIIQVLQSKHPGDFGADAQGAMNKALELFRKDMASNYKELGFQG"
+  }
+ ]
+}

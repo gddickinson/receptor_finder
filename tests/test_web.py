@@ -95,6 +95,10 @@ def test_audit_numbers():
     seq = EXAMPLE.split(">AT2G23456")[1].split(">")[0].split("\n", 1)[1].replace("\n", "")
     assert all(l["position"] == seq.find(l["loop"]) >= 0 for l in a["ef_hand"]["loops"])
     assert a["ef_hand"]["detected"] == 4 and a["ef_hand"]["decoys_detected"] == 0
+    assert a["ef_hand"]["calmodulin_match"] == {"accession": "P0DP23", "length": 129, "example_range": [5, 133],
+                                                "uniprot_range": [21, 149]}
+    eb = a["ef_hand_benchmark"]
+    assert (eb["found"], eb["annotated"], eb["extra"], eb["ef_hand_domains"]) == (13, 13, 0, 18)
     assert a["tm_min_length"]["shortest_detected"] == 14
     assert a["tm_benchmark"]["found"] == 13 and a["tm_benchmark"]["annotated"] == 16
     assert a["phylo"]["never_returned"] == [] and len(a["phylo"]["counts"]) == 7

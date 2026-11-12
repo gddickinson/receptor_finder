@@ -9,7 +9,7 @@ export const KD = { A: 1.8, R: -4.5, N: -3.5, D: -3.5, C: 2.5, Q: -3.5, E: -3.5,
 export const MOTIFS = {
   P_loop: 'G[KR].{1,5}G[KR][ST]',
   Walker_B: '[RK].{2,4}[LIVM].{2,4}D',
-  EF_hand: 'D[^W][DNS][^ILVFYW][DENSTG][DNQGHRK][^GP][LIVMC][DENQSTAGC].{2}[DE][LIVMFYW]',  // PROSITE PS00018
+  EF_hand: 'D.[DENQST].[DENQST]G.{5}[DE]',  // canonical 12-residue EF-hand loop (THIRD_PARTY.md)
   Acidic_cluster: '[DE]{3,5}',
   Arg_cluster: '[RK]{2,4}',
   Selectivity_filter: '[TSD][TSD][DE]',

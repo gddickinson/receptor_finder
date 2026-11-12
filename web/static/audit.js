@@ -6,7 +6,7 @@ const KIND = { 'example input': 'info', placeholder: 'no', 'figure, untraceable'
 
 route('audit', async () => {
   const [files, a] = await Promise.all([api('/files'), api('/audit')]);
-  const ef = a.ef_hand, tm = a.tm_min_length, tb = a.tm_benchmark, ph = a.phylo;
+  const ef = a.ef_hand, eb = a.ef_hand_benchmark, cm = a.ef_hand.calmodulin_match, tm = a.tm_min_length, tb = a.tm_benchmark, ph = a.phylo;
   app().innerHTML = `<p class="kicker">Evidence audit</p><h1>What is committed, and what the rules can detect</h1>
     <p class="lead">Every number on this page is computed by the repo's own Python code (web/audit.py) from the committed
       files. The repository holds no proteome search, no ranked candidate list and no real structure, pocket or
@@ -19,19 +19,27 @@ route('audit', async () => {
         <td class="small">${esc(f.note)}</td></tr>`)}</tbody></table></div>
 
     <h2>1 · EF-hand motif against calmodulin's loops</h2>
-    <p>Positive set: the four 12-residue Ca²⁺-binding loops in example sequence AT2G23456, whose first ~130 residues
-      reproduce calmodulin's EF-hand region. Decoys: the same loops with the position-1 Asp (a Ca²⁺ ligand) changed to
-      Ala. The motif is ${esc(ef.source)}, <code class="wrapcode">${esc(ef.pattern)}</code>: 13 positions, the loop plus
-      the hydrophobic residue after it.</p>
-    <div class="scroll"><table><thead><tr><th>Loop (+ next)</th><th class="num">Position</th><th>Loop</th><th>D1A decoy</th></tr></thead><tbody>
-      ${list(ef.loops, l => `<tr><td class="mono">${esc(l.loop)}<span class="mute">${esc(l.next)}</span></td><td class="num">${l.position}</td>
+    <p>Positive set: the four 12-residue Ca²⁺-binding loops in example sequence AT2G23456, whose residues
+      ${cm.example_range.join('-')} are identical to human calmodulin (UniProt ${esc(cm.accession)}, residues
+      ${cm.uniprot_range.join('-')}). Decoys: the same loops with the position-1 Asp (a Ca²⁺ ligand) changed to Ala.
+      The motif is the ${esc(ef.source)}, <code class="wrapcode">${esc(ef.pattern)}</code>: Asp at 1, side-chain oxygen
+      ligands at 3 and 5, Gly at 6, Glu or Asp at 12.</p>
+    <div class="scroll"><table><thead><tr><th>Loop</th><th class="num">Position</th><th>Loop</th><th>D1A decoy</th></tr></thead><tbody>
+      ${list(ef.loops, l => `<tr><td class="mono">${esc(l.loop)}</td><td class="num">${l.position}</td>
         <td>${l.hit ? '<span class="badge ok">match</span>' : '<span class="badge no">no match</span>'}</td>
         <td>${l.d1a_mutant_hit ? '<span class="badge no">match</span>' : '<span class="badge ok">rejected</span>'}</td></tr>`)}</tbody></table></div>
-    <p class="callout"><b>${ef.detected} of ${ef.loops.length}</b> loops found and ${ef.decoys_detected} of
-      ${ef.loops.length} decoys matched. What the pattern cannot do: it reads sequence only, so it cannot tell a
-      Ca²⁺-binding EF hand from a degenerate one that has lost binding, and it misses non-canonical loops (for
-      example the 14-residue S100 pseudo-EF-hand). The earlier pattern, <code>D.{2}[DNS]...[DNS].{2}[EQ]</code>,
-      found none of these loops.</p>
+    <p>On UniProt-annotated EF-hand proteins (${esc(eb.source.split(',')[0])}, retrieved ${esc(eb.retrieved)}), a loop
+      counts as annotated when UniProt lists Ca²⁺ ligands at its positions 1, 3, 5 and 12:</p>
+    <div class="scroll"><table><thead><tr><th>Protein</th><th class="num">EF-hand domains</th><th>Annotated loops</th><th>Motif hits</th></tr></thead><tbody>
+      ${list(eb.rows, r => `<tr><td><span class="mono">${esc(r.accession)}</span> ${esc(r.name)}</td><td class="num">${r.ef_hand_domains}</td>
+        <td class="small mono">${esc(r.annotated_loops.join(', ') || '-')}</td><td class="small mono">${esc(r.hits.join(', ') || '-')}</td></tr>`)}</tbody></table></div>
+    <p class="callout"><b>${ef.detected} of ${ef.loops.length}</b> example loops found and ${ef.decoys_detected} of
+      ${ef.loops.length} decoys matched; <b>${eb.found} of ${eb.annotated}</b> UniProt-annotated loops found with
+      ${eb.extra} other hit(s), and no hit in the ${eb.ef_hand_domains - eb.annotated} EF-hand domains that do not bind
+      Ca²⁺ this way (S100 pseudo-EF-hands, troponin C site I, recoverin EF1 and EF4). What the motif cannot do: it
+      reads sequence only, so a loop that fits it may still have lost Ca²⁺ binding, and it misses non-canonical loops
+      (the 14-residue S100 pseudo-EF-hand). The original pattern, <code>D.{2}[DNS]...[DNS].{2}[EQ]</code>, found none
+      of the calmodulin loops.</p>
 
     <h2>2 · TM prediction against UniProt annotations</h2>
     <p>The standard Kyte &amp; Doolittle rule (19-residue window, mean hydropathy ≥ 1.6; J. Mol. Biol. 1982,

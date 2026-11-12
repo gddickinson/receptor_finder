@@ -5,7 +5,8 @@
 - `requirements.txt` -- Pinned pip dependencies
 - `pyproject.toml` -- Modern packaging configuration
 - `README.md` -- Project documentation
-- `THIRD_PARTY.md` -- sources, retrieval dates and licences of PROSITE, UniProt and PubChem data used
+- `THIRD_PARTY.md` -- sources, retrieval dates and licences of UniProt, PubChem and ChEMBL data and literature definitions used
+  (and why PROSITE is not used)
 
 ## Package: `src/`
 
@@ -14,7 +15,7 @@
   - `ProteinSequence` (dataclass): sequence + annotations
   - `TransmembraneDomainPredictor`: Kyte-Doolittle TM prediction (window 19, threshold 1.6; configurable)
   - `SequenceFilter`: filter by length, TM domains, motifs
-  - `MotifScanner`: regex motif scanning (EF_hand = PROSITE PS00018)
+  - `MotifScanner`: regex motif scanning (EF_hand = canonical 12-residue loop, `EF_HAND_LOOP`)
   - `SequenceDatabase`: FASTA I/O and database operations
 
 - `structure_prediction.py`
@@ -72,7 +73,8 @@
   `/score` run the src/ code) and `STATIC_ENDPOINTS` for the static export. No route calls an external service.
 - `web/repo_data.py` -- read-only facts from src/ and committed files (motifs, defaults, scoring tables, ligand checks,
   `FILE_STATUS` describing every committed data/output file)
-- `web/audit.py` -- benchmarks of the shipped rules (EF-hand loops, shortest TM run, phylogeny reachability)
+- `web/audit.py` -- benchmarks of the shipped rules (EF-hand loops on the example and UniProt proteins, shortest TM
+  run, UniProt TM benchmark, phylogeny reachability)
 - `web/static/` -- ES-module front end: `main.js` (router), pages `home.js`, `method.js`, `sequence.js` (+ `seq_view.js`),
   `scoring.js`, `audit.js`, `about.js`; `static_api.js` answers api() on the static site
   - `seq_engine.js` -- JS port of sequence_analysis.py (KD profile in numpy's summation order, TM domains, motifs, FASTA, filter)
