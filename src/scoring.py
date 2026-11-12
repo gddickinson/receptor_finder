@@ -155,6 +155,16 @@ class StructuralScorer:
 
 class EvolutionaryScorer:
     """Score evolutionary patterns."""
+
+    PATTERN_SCORES = {
+        "Chlamydomonas_loss": 10.0,
+        "Land_plant_innovation": 8.0,
+        "Angiosperm_specific": 6.0,
+        "Bryophyte_origin": 7.0,
+        "Conserved": 4.0,
+        "Sporadic": 2.0,
+        "Unknown": 0.0
+    }
     
     @staticmethod
     def score_phylogenetic_pattern(pattern: str) -> float:
@@ -178,17 +188,7 @@ class EvolutionaryScorer:
         score : float
             Score 0-10
         """
-        pattern_scores = {
-            "Chlamydomonas_loss": 10.0,
-            "Land_plant_innovation": 8.0,
-            "Angiosperm_specific": 6.0,
-            "Bryophyte_origin": 7.0,
-            "Conserved": 4.0,
-            "Sporadic": 2.0,
-            "Unknown": 0.0
-        }
-        
-        return pattern_scores.get(pattern, 0.0)
+        return EvolutionaryScorer.PATTERN_SCORES.get(pattern, 0.0)
     
     @staticmethod
     def score_gene_expansion(copy_number: int,
@@ -288,6 +288,27 @@ class ExpressionScorer:
 
 class LocalizationScorer:
     """Score subcellular localization."""
+
+    LOCALIZATION_SCORES = {
+        "tonoplast": 10.0,
+        "vacuole": 10.0,
+        "ER": 9.0,
+        "endoplasmic_reticulum": 9.0,
+        "plasma_membrane": 6.0,
+        "endomembrane": 7.0,
+        "golgi": 5.0,
+        "mitochondria": 2.0,
+        "chloroplast": 2.0,
+        "nucleus": 1.0,
+        "cytosol": 1.0
+    }
+    SIGNAL_TYPE_SCORES = {
+        "ER": 5.0,
+        "vacuolar": 5.0,
+        "secretory": 4.0,
+        "mitochondrial": 1.0,
+        "chloroplast": 1.0
+    }
     
     @staticmethod
     def score_localization(predicted_location: str) -> float:
@@ -310,21 +331,7 @@ class LocalizationScorer:
         score : float
             Score 0-10
         """
-        localization_scores = {
-            "tonoplast": 10.0,
-            "vacuole": 10.0,
-            "ER": 9.0,
-            "endoplasmic_reticulum": 9.0,
-            "plasma_membrane": 6.0,
-            "endomembrane": 7.0,
-            "golgi": 5.0,
-            "mitochondria": 2.0,
-            "chloroplast": 2.0,
-            "nucleus": 1.0,
-            "cytosol": 1.0
-        }
-        
-        return localization_scores.get(predicted_location.lower(), 0.0)
+        return LocalizationScorer.LOCALIZATION_SCORES.get(predicted_location.lower(), 0.0)
     
     @staticmethod
     def score_signal_peptide(has_signal: bool,
@@ -348,14 +355,7 @@ class LocalizationScorer:
             return 0.0
         
         if signal_type:
-            type_scores = {
-                "ER": 5.0,
-                "vacuolar": 5.0,
-                "secretory": 4.0,
-                "mitochondrial": 1.0,
-                "chloroplast": 1.0
-            }
-            return type_scores.get(signal_type, 2.0)
+            return LocalizationScorer.SIGNAL_TYPE_SCORES.get(signal_type, 2.0)
         else:
             return 2.0
 
