@@ -53,16 +53,34 @@ class DockingResult:
 class LigandLibrary:
     """Library of ligands for docking."""
     
-    # SMILES strings for key ligands
+    # SMILES strings for key ligands: PubChem isomeric SMILES (PUG REST
+    # property "SMILES"), retrieved 2026-11-12. CIDs and the canonical
+    # (connectivity) SMILES are recorded in THIRD_PARTY.md.
     LIGANDS = {
-        'InsP3': 'C(C1C(C(C(C(O1)OP(=O)(O)O)OP(=O)(O)O)O)OP(=O)(O)O)OP(=O)(O)O',
-        'InsP4': 'C(C1C(C(C(C(O1)OP(=O)(O)O)OP(=O)(O)O)OP(=O)(O)O)OP(=O)(O)O)OP(=O)(O)O',
-        'cADPR': 'C1C2C(C(C(O2)N3C=NC4=C3N=CN=C4N)O)OP(=O)(O1)OP(=O)(O)OC5C(C(C(O5)N6C=CC(=NC6=O)N)O)O',
-        'NAADP': 'C1=CC(=C[N+](=C1)C2C(C(C(O2)COP(=O)([O-])OP(=O)([O-])OC3C(C(C(O3)N4C=NC5=C(N=CN=C54)N)O)O)O)O)[N+](=O)[O-]',
-        'NAD': 'C1=CC(=C[N+](=C1)C2C(C(C(O2)COP(=O)([O-])OP(=O)([O-])OC3C(C(C(O3)N4C=NC5=C(N=CN=C54)N)O)O)O)O)C(=O)N',
-        '8-NH2-cADPR': 'C1C2C(C(C(O2)N3C=NC4=C3N=C(N=C4N)N)O)OP(=O)(O1)OP(=O)(O)OC5C(C(C(O5)N6C=CC(=NC6=O)N)O)O'
+        # CID 439456, Ins(1,4,5)P3, C6H15O15P3
+        'InsP3': '[C@H]1([C@@H]([C@H]([C@@H]([C@H]([C@@H]1OP(=O)(O)O)O)OP(=O)(O)O)OP(=O)(O)O)O)O',
+        # CID 107758, inositol 1,3,4,5-tetrakisphosphate, C6H16O18P4
+        'InsP4': '[C@H]1([C@H](C([C@H]([C@H](C1OP(=O)(O)O)O)OP(=O)(O)O)OP(=O)(O)O)OP(=O)(O)O)O',
+        # CID 123847, cyclic ADP-ribose, C15H21N5O13P2
+        'cADPR': 'C1[C@@H]2[C@H]([C@H]([C@@H](O2)N3C=NC4=C3N=CN(C4=N)[C@H]5[C@@H]([C@@H]([C@H](O5)COP(=O)(OP(=O)(O1)O)O)O)O)O)O',
+        # CID 123952, nicotinic acid adenine dinucleotide phosphate, C21H27N6O18P3
+        'NAADP': 'C1=CC(=C[N+](=C1)[C@H]2[C@@H]([C@@H]([C@H](O2)COP(=O)([O-])OP(=O)(O)OC[C@@H]3[C@H]([C@H]([C@@H](O3)N4C=NC5=C(N=CN=C54)N)OP(=O)(O)O)O)O)O)C(=O)O',
+        # CID 5892, NAD+ (nadide), C21H27N7O14P2
+        'NAD': 'C1=CC(=C[N+](=C1)[C@H]2[C@@H]([C@@H]([C@H](O2)COP(=O)([O-])OP(=O)(O)OC[C@@H]3[C@H]([C@H]([C@@H](O3)N4C=NC5=C(N=CN=C54)N)O)O)O)O)C(=O)N',
+        # Derived from CID 123847 by adding the 8-amino group (adenine C8-H -> C8-NH2),
+        # C15H22N6O13P2. PubChem's only record for this name (CID 135600320)
+        # is not a cyclic structure, so it was not used; see THIRD_PARTY.md.
+        '8-NH2-cADPR': 'C1[C@@H]2[C@H]([C@H]([C@@H](O2)N3C(N)=NC4=C3N=CN(C4=N)[C@H]5[C@@H]([C@@H]([C@H](O5)COP(=O)(OP(=O)(O1)O)O)O)O)O)O',
     }
-    
+    LIGAND_SOURCES = {
+        'InsP3': 'PubChem CID 439456',
+        'InsP4': 'PubChem CID 107758',
+        'cADPR': 'PubChem CID 123847',
+        'NAADP': 'PubChem CID 123952',
+        'NAD': 'PubChem CID 5892',
+        '8-NH2-cADPR': 'derived from PubChem CID 123847 (8-amino added)',
+    }
+
     @classmethod
     def get_ligand_smiles(cls, ligand_name: str) -> Optional[str]:
         """Get SMILES string for ligand."""

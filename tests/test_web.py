@@ -99,7 +99,7 @@ def test_audit_numbers():
     assert a["tm_benchmark"]["found"] == 13 and a["tm_benchmark"]["annotated"] == 16
     assert a["phylo"]["never_returned"] == [] and len(a["phylo"]["counts"]) == 7
     lig = {x["name"]: x for x in a["ligands"]}
-    assert lig["InsP3"]["phosphorus"] == 4 and lig["NAD"]["notes"] == []
+    assert lig["InsP3"]["phosphorus"] == 3 and all(x["notes"] == [] for x in lig.values())
 
 
 def test_no_network_in_web_code():

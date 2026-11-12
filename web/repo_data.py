@@ -67,7 +67,7 @@ def ligands():
         if CYTOSINE in smi:
             notes.append("contains a cytosine base (" + CYTOSINE + "); cADPR has adenine and no cytosine")
         out.append({"name": name, "smiles": smi, "phosphorus": p, "expected_phosphates": EXPECTED_PHOSPHATES[name],
-                    "notes": notes})
+                    "source": LigandLibrary.LIGAND_SOURCES.get(name, ""), "notes": notes})
     return out
 
 

@@ -67,10 +67,13 @@ route('audit', async () => {
       absent from the alga, the opposite of the documented definition.</p>
 
     <h2>5 · Ligand library (docking.py)</h2>
-    <p>Phosphorus atoms counted in each SMILES string against the phosphate groups the named ligand has.</p>
-    <div class="scroll"><table><thead><tr><th>Ligand</th><th class="num">P in SMILES</th><th class="num">Expected</th><th>Notes</th></tr></thead><tbody>
-      ${list(a.ligands, l => `<tr><td class="mono">${esc(l.name)}</td><td class="num">${l.phosphorus}</td><td class="num">${l.expected_phosphates}</td>
-        <td class="small">${l.notes.length ? list(l.notes, x => `<span class="err">${esc(x)}</span>`, '<br>') : '<span class="ok">no problem found by these checks</span>'}</td></tr>`)}</tbody></table></div>
-    <p class="small mute">Docking itself is a placeholder in this repo, so these SMILES have not yet affected any
-      result; they would once real docking is wired in.</p>`;
+    <p>SMILES from PubChem (isomeric SMILES via the PUG REST API, retrieved 2026-11-12; see THIRD_PARTY.md). Checked here:
+      phosphorus atoms against the phosphate groups each ligand has, a carbocyclic inositol ring, and no cytosine base.</p>
+    <div class="scroll"><table><thead><tr><th>Ligand</th><th>Source</th><th class="num">P in SMILES</th><th class="num">Expected</th><th>Checks</th></tr></thead><tbody>
+      ${list(a.ligands, l => `<tr><td class="mono">${esc(l.name)}</td><td class="small">${esc(l.source)}</td><td class="num">${l.phosphorus}</td><td class="num">${l.expected_phosphates}</td>
+        <td class="small">${l.notes.length ? list(l.notes, x => `<span class="err">${esc(x)}</span>`, '<br>') : '<span class="ok">pass</span>'}</td></tr>`)}</tbody></table></div>
+    <p class="small mute">PubChem's only record named 8-amino-cADPR (CID 135600320) is not a cyclic structure, so the
+      library derives 8-NH2-cADPR from cADPR (CID 123847) by adding the 8-amino group; its formula,
+      C15H22N6O13P2, matches that record's. The earlier library had InsP3/InsP4 as pyranose sugars with 4/5 phosphates,
+      cytosine in cADPR and 8-NH2-cADPR, and a nitro group in NAADP. Docking itself is still a placeholder.</p>`;
 });

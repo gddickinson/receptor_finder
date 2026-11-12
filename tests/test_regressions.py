@@ -199,3 +199,48 @@ class TestPhylogeneticPatterns(unittest.TestCase):
         seen = {classify_distribution("G", dict(zip(self.SPECIES, bits))).pattern
                 for bits in product([False, True], repeat=len(self.SPECIES))}
         self.assertEqual(seen, set(EvolutionaryScorer.PATTERN_SCORES))
+
+
+def _heavy_atoms(smiles):
+    """Heavy-atom counts from a SMILES string (enough to compare with a molecular formula)."""
+    import re
+    counts = {}
+    for tok in re.findall(r"\[[^\]]+\]|Cl|Br|[BCNOPSFI]|[cnops]", smiles):
+        el = re.match(r"\[?\d*([A-Z][a-z]?|[cnops])", tok).group(1).capitalize()
+        counts[el] = counts.get(el, 0) + 1
+    return counts
+
+
+class TestLigandLibrary(unittest.TestCase):
+    """SMILES are PubChem's (see THIRD_PARTY.md); heavy atoms must match the PubChem molecular formula."""
+
+    FORMULA = {  # PubChem CID: molecular formula without H
+        "InsP3": {"C": 6, "O": 15, "P": 3},           # CID 439456 C6H15O15P3
+        "InsP4": {"C": 6, "O": 18, "P": 4},           # CID 107758 C6H16O18P4
+        "cADPR": {"C": 15, "N": 5, "O": 13, "P": 2},  # CID 123847 C15H21N5O13P2
+        "NAADP": {"C": 21, "N": 6, "O": 18, "P": 3},  # CID 123952 C21H27N6O18P3
+        "NAD": {"C": 21, "N": 7, "O": 14, "P": 2},    # CID 5892 C21H27N7O14P2
+        "8-NH2-cADPR": {"C": 15, "N": 6, "O": 13, "P": 2},  # derived from CID 123847, see THIRD_PARTY.md
+    }
+
+    def test_formulas(self):
+        from docking import LigandLibrary
+        for name, f in self.FORMULA.items():
+            self.assertEqual(_heavy_atoms(LigandLibrary.LIGANDS[name]), f, name)
+
+    def test_bases(self):
+        from docking import LigandLibrary
+        adenine_like = "N=CN"  # purine ring fragment present in every adenine-containing SMILES here
+        for name in ("cADPR", "NAADP", "NAD", "8-NH2-cADPR"):
+            smi = LigandLibrary.LIGANDS[name]
+            self.assertIn(adenine_like, smi, name)
+            self.assertNotIn("C=CC(=NC", smi, name)  # cytosine ring fragment of the old cADPR SMILES
+        self.assertIn("C(=O)O", LigandLibrary.LIGANDS["NAADP"])  # nicotinic acid, not nitro
+        self.assertNotIn("[N+](=O)[O-]", LigandLibrary.LIGANDS["NAADP"])
+        self.assertTrue(LigandLibrary.LIGANDS["NAD"].endswith("C(=O)N"))  # nicotinamide
+
+    def test_inositol_ring_is_carbocyclic(self):
+        from docking import LigandLibrary
+        for name in ("InsP3", "InsP4"):
+            self.assertNotIn("O1", LigandLibrary.LIGANDS[name], name)
+            self.assertNotIn("N", LigandLibrary.LIGANDS[name], name)
