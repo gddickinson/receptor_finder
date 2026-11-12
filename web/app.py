@@ -68,6 +68,8 @@ class AnalyseIn(BaseModel):
     fasta: str
     window: int = 19
     threshold: float = 1.6
+    min_windows: int = 1
+    merge_gap: int = 5
     min_length: int = 200
     max_length: int = 2000
     min_tm: int = 2
@@ -85,7 +87,8 @@ def analyse(body: AnalyseIn):
     _load_text(tmp, body.fasta)
     out = []
     for s in tmp.sequences:
-        tm = TransmembraneDomainPredictor.predict_tm_domains(s.sequence, body.window, body.threshold)
+        tm = TransmembraneDomainPredictor.predict_tm_domains(s.sequence, body.window, body.threshold,
+                                                             body.min_windows, body.merge_gap)
         length_ok = body.min_length <= s.length <= body.max_length
         tm_ok = body.min_tm <= len(tm) <= body.max_tm
         out.append({"id": s.sequence_id, "description": s.description, "length": s.length,

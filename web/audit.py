@@ -40,6 +40,24 @@ def tm_min_length(flank="K", core="L", flank_len=20):
             "shortest_detected": first}
 
 
+def tm_benchmark():
+    """UniProt-annotated TM proteins and soluble decoys (tests/fixtures/uniprot_tm_benchmark.json, fetched once)."""
+    import json
+    bench = json.loads((repo_data.ROOT / "tests" / "fixtures" / "uniprot_tm_benchmark.json").read_text())
+    rows = []
+    for e in bench["entries"]:
+        pred = TransmembraneDomainPredictor.predict_tm_domains(e["sequence"])
+        ann = e["transmembrane"]
+        hit = lambda s, t: any(a < t and s - 1 < b for a, b in pred)  # noqa: E731
+        rows.append({"accession": e["accession"], "id": e["id"], "name": e["name"], "length": len(e["sequence"]),
+                     "annotated": ann, "predicted": [list(p) for p in pred],
+                     "found": sum(hit(s, t) for s, t in ann),
+                     "extra": sum(not any(a < t and s - 1 < b for s, t in ann) for a, b in pred)})
+    return {"source": bench["source"], "retrieved": bench["retrieved"], "rows": rows,
+            "found": sum(r["found"] for r in rows), "annotated": sum(len(r["annotated"]) for r in rows),
+            "extra": sum(r["extra"] for r in rows)}
+
+
 def examples_tm():
     out = []
     text = repo_data.EXAMPLE_FASTA.read_text()
@@ -64,5 +82,6 @@ def phylo_reachability():
 
 
 def benchmarks():
-    return {"ef_hand": ef_hand(), "tm_min_length": tm_min_length(), "examples_tm": examples_tm(),
+    return {"ef_hand": ef_hand(), "tm_min_length": tm_min_length(), "tm_benchmark": tm_benchmark(),
+            "examples_tm": examples_tm(),
             "phylo": phylo_reachability(), "ligands": repo_data.ligands()}

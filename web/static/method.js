@@ -56,8 +56,9 @@ route('method', async () => {
     <h2>Default filter</h2>
     <p>Length ${info.filter_defaults.min_length}-${info.filter_defaults.max_length} aa, then
       ${info.filter_defaults.min_tm}-${info.filter_defaults.max_tm} predicted TM segments (window ${info.tm_defaults.window},
-      threshold ${info.tm_defaults.threshold}; a segment needs 15 consecutive windows above threshold, and segments
-      within 5 residues are merged). <a href="#/sequence">Try it</a>.</p>
+      threshold ${info.tm_defaults.threshold}: the Kyte &amp; Doolittle 1982 rule, J. Mol. Biol. 157:105-132,
+      doi:10.1016/0022-2836(82)90515-0; segments within ${info.tm_defaults.merge_gap} residues are merged).
+      <a href="#/sequence">Try it</a>.</p>
     <h2>Validation the README proposes</h2>
     <p class="mute">CRISPR knockouts, patch-clamp of isolated vacuoles, Ca²⁺ imaging of InsP₃/cADPR-induced release,
       [³H]InsP₃ or [³²P]cADPR binding assays and complementation. None of this is in the repo.</p>`;

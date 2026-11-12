@@ -67,10 +67,20 @@ class TransmembraneDomainPredictor:
     }
     
     @staticmethod
-    def predict_tm_domains(sequence: str, window: int = 19, 
-                          threshold: float = 1.6) -> List[Tuple[int, int]]:
+    def predict_tm_domains(sequence: str, window: int = 19,
+                          threshold: float = 1.6, min_windows: int = 1,
+                          merge_gap: int = 5) -> List[Tuple[int, int]]:
         """
         Predict transmembrane domains using sliding window.
+
+        Kyte & Doolittle (1982) J. Mol. Biol. 157(1):105-132,
+        doi:10.1016/0022-2836(82)90515-0: a 19-residue window whose mean
+        hydropathy is >= 1.6 marks a probable membrane-spanning segment.
+        Runs of above-threshold windows become one segment (from the first
+        window's start to the last window's end); segments closer than
+        ``merge_gap`` residues are merged. ``min_windows`` sets how many
+        consecutive windows a run needs (1 = the standard rule; the earlier
+        default of 15 missed 20-residue helices).
         
         Parameters
         ----------
@@ -80,6 +90,10 @@ class TransmembraneDomainPredictor:
             Window size for hydrophobicity calculation
         threshold : float
             Hydrophobicity threshold for TM domain
+        min_windows : int
+            Consecutive above-threshold windows needed for a segment
+        merge_gap : int
+            Merge segments separated by at most this many residues
             
         Returns
         -------
@@ -112,25 +126,22 @@ class TransmembraneDomainPredictor:
                 start = i
                 in_tm = True
             elif hydro < threshold and in_tm:
-                # Require at least 15 consecutive windows above threshold
-                # (not 15 residues: with window=19 a run of 15 windows spans
-                # at least 33 residues). The last
-                # window above threshold starts at i - 1, so the domain's
-                # exclusive end is i - 1 + window.
-                if i - start >= 15:
+                # The last window above threshold starts at i - 1, so the
+                # domain's exclusive end is i - 1 + window.
+                if i - start >= min_windows:
                     tm_domains.append((start, i - 1 + window))
                 in_tm = False
         
         # Check if still in TM at end
-        if in_tm and len(hydro_profile) - start >= 15:
+        if in_tm and len(hydro_profile) - start >= min_windows:
             tm_domains.append((start, len(hydro_profile) - 1 + window))
         
-        # Merge nearby TM domains (within 5 residues)
+        # Merge nearby TM domains (within merge_gap residues)
         if len(tm_domains) > 1:
             merged = [tm_domains[0]]
             for current in tm_domains[1:]:
                 last = merged[-1]
-                if current[0] - last[1] <= 5:
+                if current[0] - last[1] <= merge_gap:
                     merged[-1] = (last[0], current[1])
                 else:
                     merged.append(current)

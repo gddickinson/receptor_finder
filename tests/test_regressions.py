@@ -122,3 +122,38 @@ class TestEfHandProsite(unittest.TestCase):
         from sequence_analysis import MotifScanner
         seq = self._cam().replace("DKDGDGTITTKEL", "AKDGDGTITTKEL")
         self.assertEqual(len(MotifScanner.scan_sequence(seq, MotifScanner.MOTIFS["EF_hand"])), 3)
+
+
+class TestKyteDoolittleRule(unittest.TestCase):
+    """Standard Kyte & Doolittle (1982) rule: any 19-residue window with mean hydropathy >= 1.6 marks a membrane-spanning
+    segment. Benchmarked on UniProt-annotated TM proteins and soluble decoys (tests/fixtures/uniprot_tm_benchmark.json)."""
+
+    @staticmethod
+    def _bench():
+        import json
+        p = Path(__file__).resolve().parent / "fixtures" / "uniprot_tm_benchmark.json"
+        return {e["accession"]: e for e in json.loads(p.read_text())["entries"]}
+
+    @staticmethod
+    def _found(pred, annotated):
+        return sum(any(a < e and s - 1 < b for a, b in pred) for s, e in annotated)
+
+    def test_twenty_residue_helix_is_found(self):
+        tm = TransmembraneDomainPredictor.predict_tm_domains("K" * 20 + "L" * 20 + "K" * 20)
+        self.assertEqual(len(tm), 1)
+
+    def test_known_tm_proteins(self):
+        b = self._bench()
+        expect = {"P02724": 1, "P02945": 5, "P29972": 5, "P0AEJ4": 2}  # annotated: 1, 7, 6, 2
+        for acc, n in expect.items():
+            pred = TransmembraneDomainPredictor.predict_tm_domains(b[acc]["sequence"])
+            self.assertEqual(self._found(pred, b[acc]["transmembrane"]), n, acc)
+
+    def test_soluble_decoys_have_none(self):
+        b = self._bench()
+        for acc in ("P0DP23", "P02144"):
+            self.assertEqual(TransmembraneDomainPredictor.predict_tm_domains(b[acc]["sequence"]), [], acc)
+
+    def test_old_rule_still_available(self):
+        seq = "K" * 20 + "L" * 20 + "K" * 20
+        self.assertEqual(TransmembraneDomainPredictor.predict_tm_domains(seq, min_windows=15), [])

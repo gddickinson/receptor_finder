@@ -36,6 +36,8 @@ def _profile(seq, window=19):
 def sequence_cases():
     rng = np.random.default_rng(20261112)
     seqs = dict(read_fasta(str(ROOT / "data" / "example_sequences.fasta")))
+    bench = json.loads((ROOT / "tests" / "fixtures" / "uniprot_tm_benchmark.json").read_text())
+    seqs.update({e["accession"]: e["sequence"] for e in bench["entries"]})
     for n in (15, 20, 22, 23, 33, 40):
         seqs[f"polyL_{n}"] = "K" * 20 + "L" * n + "K" * 20
     seqs["two_close"] = "K" * 10 + "L" * 35 + "KK" + "L" * 35 + "K" * 10
@@ -56,6 +58,7 @@ def sequence_cases():
             "id": sid, "sequence": seq, "profile": _profile(seq),
             "tm": [list(t) for t in TransmembraneDomainPredictor.predict_tm_domains(seq)],
             "tm_w15_t1": [list(t) for t in TransmembraneDomainPredictor.predict_tm_domains(seq, 15, 1.0)],
+            "tm_minw15_gap0": [list(t) for t in TransmembraneDomainPredictor.predict_tm_domains(seq, 19, 1.6, 15, 0)],
             "motifs": {m: MotifScanner.scan_sequence(seq, p) for m, p in MotifScanner.MOTIFS.items()},
         })
     return cases

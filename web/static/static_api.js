@@ -14,7 +14,8 @@ export async function staticApi(path, body) {
   const clean = path.split('?')[0].replace(/^\/+/, '');
   if (clean === 'analyse') {
     const o = body || {};
-    const results = analyse(parseFasta(o.fasta || ''), { window: o.window, threshold: o.threshold, minLength: o.min_length,
+    const results = analyse(parseFasta(o.fasta || ''), { window: o.window, threshold: o.threshold,
+      minWindows: o.min_windows, mergeGap: o.merge_gap, minLength: o.min_length,
       maxLength: o.max_length, minTm: o.min_tm, maxTm: o.max_tm });
     return { engine: 'javascript', results };
   }

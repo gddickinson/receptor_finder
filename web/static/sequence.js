@@ -22,19 +22,24 @@ route('sequence', async () => {
         <div><label for="w">Window</label><input id="w" type="number" min="5" max="60" value="${t.window}"></div>
         <div><label for="th">Threshold</label><input id="th" type="number" step="0.1" value="${t.threshold}"></div></div>
       <div class="row">
+        <div><label for="mw">Min windows</label><input id="mw" type="number" min="1" value="${t.min_windows}"></div>
+        <div><label for="mg">Merge gap</label><input id="mg" type="number" min="0" value="${t.merge_gap}"></div></div>
+      <div class="row">
         <div><label for="minl">Min length</label><input id="minl" type="number" value="${f.min_length}"></div>
         <div><label for="maxl">Max length</label><input id="maxl" type="number" value="${f.max_length}"></div></div>
       <div class="row">
         <div><label for="mint">Min TM</label><input id="mint" type="number" value="${f.min_tm}"></div>
         <div><label for="maxt">Max TM</label><input id="maxt" type="number" value="${f.max_tm}"></div></div>
       <button id="run">Analyse</button><button id="ex" class="alt">Reset to examples</button>
-      <p class="small mute">Defaults are the Python defaults. The example IDs are placeholders, not Arabidopsis loci.</p>
+      <p class="small mute">Defaults are the Python defaults: the Kyte &amp; Doolittle (1982) rule, a 19-residue window
+        with mean hydropathy ≥ 1.6. The example IDs are placeholders, not Arabidopsis loci.</p>
     </div><div id="out"></div></div>`;
   const run = async () => {
     state.fasta = $('#fa').value;
     const recs = parseFasta(state.fasta);
     if (!recs.length) { $('#out').innerHTML = '<p class="err">No FASTA records found (headers start with &gt;).</p>'; return; }
-    const body = { fasta: state.fasta, window: +$('#w').value, threshold: +$('#th').value, min_length: +$('#minl').value,
+    const body = { fasta: state.fasta, window: +$('#w').value, threshold: +$('#th').value,
+      min_windows: +$('#mw').value, merge_gap: +$('#mg').value, min_length: +$('#minl').value,
       max_length: +$('#maxl').value, min_tm: +$('#mint').value, max_tm: +$('#maxt').value };
     $('#run').disabled = true;
     try {

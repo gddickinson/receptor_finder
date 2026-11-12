@@ -66,7 +66,8 @@ def test_analyse_matches_python_core():
     seqs = read_fasta(str(ROOT / "data" / "example_sequences.fasta"))
     for x in r["results"]:
         assert x["tm"] == [list(t) for t in TransmembraneDomainPredictor.predict_tm_domains(seqs[x["id"]])]
-    assert not any(x["passes"] for x in r["results"])
+    assert [x["n_tm"] for x in r["results"]] == [len(TransmembraneDomainPredictor.predict_tm_domains(seqs[x["id"]]))
+                                                 for x in r["results"]]
 
 
 def test_analyse_rejects_bad_window():
@@ -94,7 +95,8 @@ def test_audit_numbers():
     seq = EXAMPLE.split(">AT2G23456")[1].split(">")[0].split("\n", 1)[1].replace("\n", "")
     assert all(l["position"] == seq.find(l["loop"]) >= 0 for l in a["ef_hand"]["loops"])
     assert a["ef_hand"]["detected"] == 4 and a["ef_hand"]["decoys_detected"] == 0
-    assert a["tm_min_length"]["shortest_detected"] == 23
+    assert a["tm_min_length"]["shortest_detected"] == 14
+    assert a["tm_benchmark"]["found"] == 13 and a["tm_benchmark"]["annotated"] == 16
     assert set(a["phylo"]["never_returned"]) == {"Angiosperm_specific", "Land_plant_innovation", "Bryophyte_origin", "Unknown"}
     lig = {x["name"]: x for x in a["ligands"]}
     assert lig["InsP3"]["phosphorus"] == 4 and lig["NAD"]["notes"] == []

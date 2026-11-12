@@ -15,9 +15,9 @@ export const MOTIFS = {
   Selectivity_filter: '[TSD][TSD][DE]',
 };
 
-// Defaults from the Python signatures: predict_tm_domains(window=19, threshold=1.6), the 15-window minimum run and
-// 5-residue merge gap inside it, and SequenceDatabase.filter_database(200, 2000, 2, 10).
-export const DEFAULTS = { window: 19, threshold: 1.6, minWindows: 15, mergeGap: 5,
+// Defaults from the Python signatures: predict_tm_domains(window=19, threshold=1.6, min_windows=1, merge_gap=5), the
+// standard Kyte & Doolittle (1982) rule, and SequenceDatabase.filter_database(200, 2000, 2, 10).
+export const DEFAULTS = { window: 19, threshold: 1.6, minWindows: 1, mergeGap: 5,
   minLength: 200, maxLength: 2000, minTm: 2, maxTm: 10 };
 
 // numpy's float64 pairwise summation (8 accumulators up to 128 items, then halving), so a window mean lands on exactly
@@ -48,23 +48,24 @@ export function hydroProfile(sequence, window = DEFAULTS.window) {
 }
 
 // TransmembraneDomainPredictor.predict_tm_domains: [start, end) residue ranges (0-based, end exclusive).
-export function predictTmDomains(sequence, window = DEFAULTS.window, threshold = DEFAULTS.threshold) {
+export function predictTmDomains(sequence, window = DEFAULTS.window, threshold = DEFAULTS.threshold,
+  minWindows = DEFAULTS.minWindows, mergeGap = DEFAULTS.mergeGap) {
   if (sequence.length < window) return [];
   const prof = hydroProfile(sequence, window), tm = [];
   let inTm = false, start = 0;
   prof.forEach((h, i) => {
     if (h >= threshold && !inTm) { start = i; inTm = true; }
     else if (h < threshold && inTm) {
-      if (i - start >= DEFAULTS.minWindows) tm.push([start, i - 1 + window]);
+      if (i - start >= minWindows) tm.push([start, i - 1 + window]);
       inTm = false;
     }
   });
-  if (inTm && prof.length - start >= DEFAULTS.minWindows) tm.push([start, prof.length - 1 + window]);
+  if (inTm && prof.length - start >= minWindows) tm.push([start, prof.length - 1 + window]);
   if (tm.length < 2) return tm;
   const merged = [tm[0]];
   for (const cur of tm.slice(1)) {
     const last = merged[merged.length - 1];
-    if (cur[0] - last[1] <= DEFAULTS.mergeGap) merged[merged.length - 1] = [last[0], cur[1]];
+    if (cur[0] - last[1] <= mergeGap) merged[merged.length - 1] = [last[0], cur[1]];
     else merged.push(cur);
   }
   return merged;
@@ -102,7 +103,7 @@ export function parseFasta(text) {
 export function analyse(records, opts = {}) {
   const o = { ...DEFAULTS, ...opts };
   return records.map(r => {
-    const tm = predictTmDomains(r.sequence, o.window, o.threshold), len = r.sequence.length;
+    const tm = predictTmDomains(r.sequence, o.window, o.threshold, o.minWindows, o.mergeGap), len = r.sequence.length;
     const lengthOk = o.minLength <= len && len <= o.maxLength, tmOk = o.minTm <= tm.length && tm.length <= o.maxTm;
     return { id: r.id, description: r.description, length: len, tm, n_tm: tm.length,
       motifs: scanAll(r.sequence), length_ok: lengthOk, tm_ok: tmOk, passes: lengthOk && tmOk };
