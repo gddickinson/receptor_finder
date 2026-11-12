@@ -20,13 +20,21 @@ Nothing here looks like an unpublished finding.
 - `score_localization('ER')` scored 0 instead of 9 (case mismatch).
 - `score_docking` slopes were reversed: -8.5 kcal/mol scored 10.75/10, weaker binders scored higher.
 
-**Needs George's decision** (benchmarks on the Audit page; code unchanged):
-- `MotifScanner.MOTIFS['EF_hand']` (`D.{2}[DNS]...[DNS].{2}[EQ]`) matches 0 of the 4 calmodulin EF-hand loops in
-  AT2G23456. A canonical alternative is PROSITE PS00018.
-- TM prediction needs 15 consecutive windows above threshold: the shortest poly-Leu stretch called is 23 residues, so
-  real TM helices (~20 residues) are often missed; the "multi-pass" example gets 1 segment.
-- `classify_distribution` can only return Chlamydomonas_loss, Conserved or Sporadic (the other branches are
-  unreachable); a family absent everywhere is "Sporadic".
-- `LigandLibrary` SMILES: InsP3/InsP4 are pyranose sugars with 4/5 phosphates, cADPR and 8-NH2-cADPR contain cytosine,
-  NAADP has a nitro group and 2 phosphates.
-- `src/scoring.py` (569 lines) and `src/gui_app.py` (1178) are over the 500-line budget (pre-existing).
+**Follow-up the same day (lead, under George's "fix any other problems" rule).** The five open items were fixed, each
+in its own "Fix ..." commit with tests and sources in THIRD_PARTY.md:
+- EF_hand is now PROSITE PS00018, copied from the entry. It finds all 4 calmodulin loops and rejects their D1A mutants.
+- TM prediction uses the standard Kyte & Doolittle (1982) rule (window 19, mean >= 1.6;
+  doi:10.1016/0022-2836(82)90515-0). `min_windows` and `merge_gap` are configurable. On UniProt-annotated proteins it
+  finds 13/16 helices (the old rule found 1/16) and nothing in calmodulin or myoglobin. Its one extra call is the
+  glycophorin A signal peptide.
+- `classify_distribution` follows docs/in_silico_calcium_projects.md section 3.1 and can return all 7 patterns. The
+  old "Chlamydomonas_loss" went to families absent from the alga, the opposite of the documented definition.
+- Ligand SMILES are PubChem isomeric SMILES (CIDs 439456, 107758, 123847, 123952, 5892), fetched once on 2026-11-12.
+  8-NH2-cADPR is derived from cADPR, because PubChem's only record for it (CID 135600320) is not cyclic.
+- scoring.py was split into scoring.py + scorers.py, and gui_app.py into gui_app.py + 3 mixins (no behaviour change).
+
+**Still for George:**
+- Confirm the derived 8-NH2-cADPR structure.
+- PROSITE is CC BY-NC-ND 4.0 while this repo is MIT; only the attributed pattern string is reproduced.
+- Pattern, TM and docking-score results all changed with these fixes. Nothing downstream is committed, so no stored
+  result is affected.
