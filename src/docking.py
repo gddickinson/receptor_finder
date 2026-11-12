@@ -67,9 +67,10 @@ class LigandLibrary:
         'NAADP': 'C1=CC(=C[N+](=C1)[C@H]2[C@@H]([C@@H]([C@H](O2)COP(=O)([O-])OP(=O)(O)OC[C@@H]3[C@H]([C@H]([C@@H](O3)N4C=NC5=C(N=CN=C54)N)OP(=O)(O)O)O)O)O)C(=O)O',
         # CID 5892, NAD+ (nadide), C21H27N7O14P2
         'NAD': 'C1=CC(=C[N+](=C1)[C@H]2[C@@H]([C@@H]([C@H](O2)COP(=O)([O-])OP(=O)(O)OC[C@@H]3[C@H]([C@H]([C@@H](O3)N4C=NC5=C(N=CN=C54)N)O)O)O)O)C(=O)N',
-        # Derived from CID 123847 by adding the 8-amino group (adenine C8-H -> C8-NH2),
-        # C15H22N6O13P2. PubChem's only record for this name (CID 135600320)
-        # is not a cyclic structure, so it was not used; see THIRD_PARTY.md.
+        # 8-amino-cADPR (Walseth & Lee 1993, doi:10.1016/0167-4889(93)90199-Y),
+        # C15H22N6O13P2: cADPR (CID 123847) with C8-NH2. Same structure (InChIKey
+        # DLAYKDRCOMDICA-AIKIOGRUSA-N once neutralised) as ChEMBL CHEMBL3350988 /
+        # PubChem CID 118719244, which are the zwitterion; see THIRD_PARTY.md.
         '8-NH2-cADPR': 'C1[C@@H]2[C@H]([C@H]([C@@H](O2)N3C(N)=NC4=C3N=CN(C4=N)[C@H]5[C@@H]([C@@H]([C@H](O5)COP(=O)(OP(=O)(O1)O)O)O)O)O)O',
     }
     LIGAND_SOURCES = {
@@ -78,7 +79,7 @@ class LigandLibrary:
         'cADPR': 'PubChem CID 123847',
         'NAADP': 'PubChem CID 123952',
         'NAD': 'PubChem CID 5892',
-        '8-NH2-cADPR': 'derived from PubChem CID 123847 (8-amino added)',
+        '8-NH2-cADPR': 'ChEMBL CHEMBL3350988 (= PubChem CID 118719244), neutral form',
     }
 
     @classmethod

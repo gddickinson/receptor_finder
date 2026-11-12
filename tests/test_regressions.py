@@ -220,7 +220,7 @@ class TestLigandLibrary(unittest.TestCase):
         "cADPR": {"C": 15, "N": 5, "O": 13, "P": 2},  # CID 123847 C15H21N5O13P2
         "NAADP": {"C": 21, "N": 6, "O": 18, "P": 3},  # CID 123952 C21H27N6O18P3
         "NAD": {"C": 21, "N": 7, "O": 14, "P": 2},    # CID 5892 C21H27N7O14P2
-        "8-NH2-cADPR": {"C": 15, "N": 6, "O": 13, "P": 2},  # derived from CID 123847, see THIRD_PARTY.md
+        "8-NH2-cADPR": {"C": 15, "N": 6, "O": 13, "P": 2},  # ChEMBL CHEMBL3350988, see THIRD_PARTY.md
     }
 
     def test_formulas(self):

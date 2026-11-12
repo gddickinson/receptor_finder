@@ -72,8 +72,8 @@ route('audit', async () => {
     <div class="scroll"><table><thead><tr><th>Ligand</th><th>Source</th><th class="num">P in SMILES</th><th class="num">Expected</th><th>Checks</th></tr></thead><tbody>
       ${list(a.ligands, l => `<tr><td class="mono">${esc(l.name)}</td><td class="small">${esc(l.source)}</td><td class="num">${l.phosphorus}</td><td class="num">${l.expected_phosphates}</td>
         <td class="small">${l.notes.length ? list(l.notes, x => `<span class="err">${esc(x)}</span>`, '<br>') : '<span class="ok">pass</span>'}</td></tr>`)}</tbody></table></div>
-    <p class="small mute">PubChem's only record named 8-amino-cADPR (CID 135600320) is not a cyclic structure, so the
-      library derives 8-NH2-cADPR from cADPR (CID 123847) by adding the 8-amino group; its formula,
-      C15H22N6O13P2, matches that record's. The earlier library had InsP3/InsP4 as pyranose sugars with 4/5 phosphates,
+    <p class="small mute">8-NH2-cADPR is the ChEMBL record CHEMBL3350988 (PubChem CID 118719244), written in its neutral
+      form: cADPR (CID 123847) with an amino group on adenine C8, C15H22N6O13P2 (Walseth &amp; Lee 1993). PubChem's
+      record found by the name 8-amino-cADPR (CID 135600320) is not cyclic and is not used. The earlier library had InsP3/InsP4 as pyranose sugars with 4/5 phosphates,
       cytosine in cADPR and 8-NH2-cADPR, and a nitro group in NAADP. Docking itself is still a placeholder.</p>`;
 });

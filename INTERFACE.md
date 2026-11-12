@@ -32,7 +32,7 @@
 
 - `docking.py`
   - `DockingResult` (dataclass): affinity + interactions
-  - `LigandLibrary`: PubChem SMILES for InsP3, InsP4, cADPR, NAADP, NAD+, 8-NH2-cADPR (`LIGAND_SOURCES`)
+  - `LigandLibrary`: PubChem/ChEMBL SMILES for InsP3, InsP4, cADPR, NAADP, NAD+, 8-NH2-cADPR (`LIGAND_SOURCES`)
   - `AutoDockVinaInterface`: dock_ligand, prepare_receptor
   - `DockingAnalyzer`: compare_ligands, assess_specificity
   - `DockingDatabase`: result collection
@@ -89,6 +89,8 @@
 - `test_regressions.py` -- regression tests for bugs fixed 2026-11-12 (TM ends, ranking field, placeholder PDB label,
   ER localization, docking score direction)
 - `test_engine_fixture.py` -- the JS-vs-Python fixture is current
+- `test_ligand_structures.py` -- 8-NH2-cADPR is cyclic, has the 8-amino group and the right formula
+- `smiles_graph.py` -- minimal SMILES reader used by the ligand tests (formula with H, ring count, ring bonds)
 - `test_web.py` -- API, static build, JS engine node tests, audit numbers, no network calls
 
 ## Pipeline Flow

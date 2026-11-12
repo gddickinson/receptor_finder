@@ -37,11 +37,37 @@ is listed for reference. PubChem data-use policy: https://www.ncbi.nlm.nih.gov/h
 | NAADP | nicotinic acid adenine dinucleotide phosphate | 123952 | Nicotinic Acid Adenine Dinucleotide Phosphate | C21H27N6O18P3 | `C1=CC(=C[N+](=C1)C2C(C(C(O2)COP(=O)([O-])OP(=O)(O)OCC3C(C(C(O3)N4C=NC5=C(N=CN=C54)N)OP(=O)(O)O)O)O)O)C(=O)O` |
 | NAD | NAD+ | 5892 | Nadide | C21H27N7O14P2 | `C1=CC(=C[N+](=C1)C2C(C(C(O2)COP(=O)([O-])OP(=O)(O)OCC3C(C(C(O3)N4C=NC5=C(N=CN=C54)N)O)O)O)O)C(=O)N` |
 
-8-NH2-cADPR: PubChem's only record for this compound (CID 135600320, query "8-amino-cADPR", CAS 151898-25-8) has a
-non-cyclic structure with enol sugars (its title is "8-Aminoadenosine cyclic 3',5'-(hydrogen phosphate)
-5'-ribofuranosyl ester"), so it was not used. The library SMILES is cADPR (CID 123847) with the adenine C8-H replaced
-by C8-NH2 (`N3C=NC4` -> `N3C(N)=NC4`). Its formula, C15H22N6O13P2 (checked with RDKit 2026.09.2), matches CID
-135600320. **George: please confirm this structure or supply a preferred source.**
+### 8-NH2-cADPR (8-amino-cyclic ADP-ribose)
+Checked 2026-11-12 against the literature and three databases. The library SMILES is the neutral form of the compound
+recorded in ChEMBL; it is cADPR (CID 123847) with adenine C8-H replaced by C8-NH2, and nothing else changed.
+
+- Primary literature: Walseth TF, Lee HC (1993). Synthesis and characterization of antagonists of
+  cyclic-ADP-ribose-induced Ca2+ release. *Biochim. Biophys. Acta* 1178(3):235-242. doi:10.1016/0167-4889(93)90199-Y
+  (PMID 8395888). The abstract reports that the 1H-NMR spectrum of 8-amino-cADPR "showed characteristics of that of
+  cADPR and confirmed the replacement of the 8-proton", i.e. the cyclic cADPR skeleton with an 8-substituent.
+- Structure of the parent: Lee HC, Aarhus R, Levitt D (1994). The crystal structure of cyclic ADP-ribose.
+  *Nat. Struct. Biol.* 1:143-144. doi:10.1038/nsb0394-143 (cyclisation through adenine N1). ChEBI CHEBI:31445
+  ("cyclic ADP-beta-D-ribose") has the same InChIKey as PubChem CID 123847 (BQOHYSXSASDCEA-KEOHHSTQSA-N), so the
+  cADPR stereocentres used here (both ribosides beta-D) are ChEBI's too.
+- Database record: ChEMBL **CHEMBL3350988** (deposited in PubChem as CID **118719244**), from Zhang B et al. (2008)
+  2'-Deoxy cyclic adenosine 5'-diphosphate ribose derivatives: importance of the 2'-hydroxyl motif for the antagonistic
+  activity of 8-substituted cADPR derivatives. *J. Med. Chem.* 51:1623-1636. doi:10.1021/jm7010386 (ChEMBL document
+  CHEMBL1142301; antagonist IC50 105 nM in sea urchin egg homogenate). ChEMBL draws it as the zwitterion (N1+ with a
+  6-amino group, one phosphate O-). Moving those two charges back (N1=C6 to C6=NH, O- to OH) gives the library SMILES
+  exactly: both have InChIKey DLAYKDRCOMDICA-AIKIOGRUSA-N (RDKit 2026.09.2), with all 8 sugar stereocentres equal.
+- Formula C15H22N6O13P2, monoisotopic mass 556.0720 (cADPR: C15H21N5O13P2, 541.0611; the difference is NH, as for an
+  amino group replacing H). Five independent rings: purine (2), two riboses, and the pyrophosphate macrocycle.
+- Not used:
+  - PubChem CID 135600320, the record found by the names "8-amino-cADPR" and "8-amino-cyclic ADP-ribose" (CAS
+    151898-25-8). It has the right formula but a non-cyclic structure: an open-chain pyrophosphate and enol sugars.
+    Its CAS-style synonym, like cADPR's own CAS name, says "N-alpha-D-ribofuranosyl"; that is the CAS index name and
+    predates the crystal structure, which showed the N1 riboside is beta.
+  - CIDs 10076390 and 22489536 (untitled, same formula): sugar stereocentres inverted relative to cADPR.
+  - ChEBI has no entry for 8-amino-cADPR (searched by name and InChIKey). The IUPHAR/BPS Guide to Pharmacology
+    could not be checked: its search and web services now require a registered account.
+- `tests/test_ligand_structures.py` checks the formula with hydrogens, the ring count, that both P atoms lie in the
+  macrocycle, the single 8-amino carbon, that removing the amino group gives the cADPR SMILES exactly, and (when RDKit
+  is installed) the InChIKey.
 
 The searches by "NAADP" (CID 52942301, cationic form) and "NAD+" (also CIDs 5893, 15938971, ...) returned several
 records; the neutral/zwitterionic parent records above were chosen.
