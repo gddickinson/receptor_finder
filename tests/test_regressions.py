@@ -85,3 +85,19 @@ class TestLocalizationCase(unittest.TestCase):
         self.assertEqual(LocalizationScorer.score_localization("Tonoplast"), 10.0)
         self.assertEqual(LocalizationScorer.score_localization("plasma_membrane"), 6.0)
         self.assertEqual(LocalizationScorer.score_localization("unknown"), 0.0)
+
+
+class TestDockingScoreDirection(unittest.TestCase):
+    """score_docking maps -9..-7 kcal/mol to 10..7, -7..-5 to 7..3 and above -5 down to 0 (its docstring)."""
+
+    def test_documented_anchor_points(self):
+        from scoring import StructuralScorer as S
+        for aff, pts in ((-10, 10), (-9, 10), (-8, 8.5), (-7, 7), (-6, 5), (-5, 3), (0, 0), (2, 0)):
+            self.assertAlmostEqual(S.score_docking(aff), pts, msg=aff)
+
+    def test_never_above_ten_and_monotonic(self):
+        from scoring import StructuralScorer as S
+        affs = [x / 10 for x in range(-120, 30)]
+        vals = [S.score_docking(a) for a in affs]
+        self.assertTrue(all(0 <= v <= 10 for v in vals))
+        self.assertTrue(all(a >= b for a, b in zip(vals, vals[1:])), "a better (more negative) affinity must not score lower")

@@ -109,13 +109,13 @@ class StructuralScorer:
             return 10.0
         elif binding_affinity < -7.0:
             # Linear interpolation: -9 to -7 maps to 10 to 7
-            return 10.0 + (binding_affinity + 9.0) * (3.0 / 2.0)
+            return 10.0 - (binding_affinity + 9.0) * (3.0 / 2.0)
         elif binding_affinity < -5.0:
             # Linear interpolation: -7 to -5 maps to 7 to 3
-            return 7.0 + (binding_affinity + 7.0) * (4.0 / 2.0)
+            return 7.0 - (binding_affinity + 7.0) * (4.0 / 2.0)
         else:
-            # > -5.0: scale from 3 to 0
-            return max(0, 3.0 + (binding_affinity + 5.0) * 0.6)
+            # >= -5.0: scale from 3 (at -5) down to 0 (at 0 kcal/mol)
+            return max(0.0, 3.0 - (binding_affinity + 5.0) * 0.6)
     
     @staticmethod
     def score_structure_quality(mean_plddt: float,
