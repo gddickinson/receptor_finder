@@ -38,3 +38,26 @@ in its own "Fix ..." commit with tests and sources in THIRD_PARTY.md:
 - PROSITE is CC BY-NC-ND 4.0 while this repo is MIT; only the attributed pattern string is reproduced.
 - Pattern, TM and docking-score results all changed with these fixes. Nothing downstream is committed, so no stored
   result is affected.
+
+## 2026-11-12 (later) -- 8-NH2-cADPR, PROSITE licence, pocket specificity (Claude)
+Both items left "for George" are now settled (details and sources in THIRD_PARTY.md):
+- **8-NH2-cADPR confirmed.** The SMILES (unchanged) is the neutral form of ChEMBL CHEMBL3350988 / PubChem CID
+  118719244 (Zhang et al. 2008, doi:10.1021/jm7010386). The InChIKey is identical once the zwitterion is neutralised,
+  and so are all 8 stereocentres. Walseth & Lee 1993 (doi:10.1016/0167-4889(93)90199-Y) describe it as cADPR with
+  the 8-proton replaced. ChEBI has no entry, and the Guide to Pharmacology needs an account.
+  `tests/test_ligand_structures.py` checks the formula with H, the 5 rings, the macrocycle, the 8-amino carbon, and
+  that removing the amino group gives cADPR exactly.
+- **PROSITE removed.** PROSITE as a whole, patterns included, is CC BY-NC-ND 4.0 with a fee for commercial users,
+  which is incompatible with MIT. EF_hand is now our own regex for the canonical 12-residue loop,
+  `D.[DENQST].[DENQST]G.{5}[DE]`, built from the literature (InterPro IPR002048, Mazumder 2014, Lin 2021).
+  - It finds all 4 calmodulin loops and 13/13 UniProt-annotated loops in 6 EF-hand proteins
+    (tests/fixtures/uniprot_efhand_benchmark.json). PROSITE found 12/13.
+  - It hits none of the 5 pseudo or non-binding EF-hands.
+  - It is less specific on random sequence (about 23 vs 1 hits per Mb).
+  - The PROSITE string is still in the git history (commit e756dc6).
+- **`PocketCharacterizer.assess_specificity`** marked every cADPR call specific without a test. It now needs a NAD+
+  score more than 2 points lower, the same rule as InsP3 vs InsP4 (optional `nad_score`).
+- Unchanged by decision: `TopologyScorer.score_tm_domains` rewards 4-8 TM (channel-like) while the filter keeps 2-10.
+  That is a wide filter followed by a narrower score, not a contradiction.
+- Tests: pytest 93 passed; node 529 scoring cases and 39 sequences match Python; screenshots --static and --base all ok
+  on 6 routes, with 0 px overflow at 390 px.
