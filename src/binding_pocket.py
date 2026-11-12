@@ -294,12 +294,15 @@ class PocketCharacterizer:
     def assess_specificity(pocket: BindingPocket,
                           insp3_score: float,
                           cadpr_score: float,
-                          insp4_score: Optional[float] = None) -> Dict:
+                          insp4_score: Optional[float] = None,
+                          nad_score: Optional[float] = None) -> Dict:
         """
         Assess ligand specificity.
         
         Important: receptor should bind InsP₃ but NOT InsP₄
-        (or cADPR but not NAD⁺).
+        (or cADPR but not NAD⁺). A call is specific only when the
+        competing ligand's score is given and is more than 2 points
+        lower; an untested call is not specific.
         
         Returns
         -------
@@ -323,7 +326,12 @@ class PocketCharacterizer:
                     assessment['specificity_ratio'] = insp3_score / (insp4_score + 0.1)
         else:
             assessment['primary_ligand'] = 'cADPR'
-            assessment['is_specific'] = True  # Assume specific unless tested otherwise
+            
+            # Check specificity (cADPR > NAD⁺), same rule as InsP₃ > InsP₄
+            if nad_score is not None:
+                if cadpr_score > nad_score + 2:
+                    assessment['is_specific'] = True
+                    assessment['specificity_ratio'] = cadpr_score / (nad_score + 0.1)
         
         return assessment
 

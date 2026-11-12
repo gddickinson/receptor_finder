@@ -37,7 +37,8 @@ route('scoring', async () => {
       <div class="row">${num('pv', 'Volume (Å³)', 250)}${num('pd', 'Depth (Å)', 8, { step: 0.5 })}</div>
       <div class="row">${num('pc', 'Net charge', 2, { step: 0.5 })}${num('ph', 'Hydrophobicity (0-1)', 0.3, { step: 0.05 })}</div>
       <div><label for="pr">Pocket residues (three-letter codes)</label><input id="pr" value="ARG LYS ASP PHE TRP"></div>
-      <div class="row">${num('pi4', 'InsP₄ pocket score (blank = untested)', '', { step: 0.5 })}</div>
+      <div class="row">${num('pi4', 'InsP₄ pocket score (blank = untested)', '', { step: 0.5 })}
+        ${num('pnad', 'NAD⁺ pocket score (blank = untested)', '', { step: 0.5 })}</div>
       <p class="small mute">The defaults are the first pocket that the placeholder PocketDetector invents for every structure.</p>
     </div><div class="panel" id="pres"></div></div>
     <h2>Phylogenetic pattern (phylogenetics.py)</h2><div class="two"><div class="panel">
@@ -74,12 +75,12 @@ async function update() {
   const pocket = { volume: n('pv'), depth: n('pd'), charge: n('pc'), hydrophobicity: n('ph'),
     residues: val('pr').toUpperCase().split(/[\s,]+/).filter(Boolean) };
   const i3 = S.scoreInsp3(pocket), cd = S.scoreCadpr(pocket), c = S.residueCounts(pocket.residues);
-  const spec = S.pocketSpecificity(i3, cd, opt('pi4'));
+  const spec = S.pocketSpecificity(i3, cd, opt('pi4'), opt('pnad'));
   $('#pres').innerHTML = `<h3>Pocket scores</h3><p><b class="mono">InsP₃ ${fmt(i3)} / 13</b> · <b class="mono">cADPR ${fmt(cd)} / 12</b></p>
     <p class="small mute">Residue classes: basic ${c.basic}, aromatic ${c.aromatic}, acidic ${c.acidic}, polar ${c.polar}.</p>
     <p>Primary ligand: <b>${spec.primary_ligand}</b> · specific: ${spec.is_specific ? 'yes' : 'no'}${spec.specificity_ratio !== null ? ` (ratio ${fmt(spec.specificity_ratio)})` : ''}</p>
-    <p class="small mute">A cADPR call is marked specific without any test (assess_specificity assumes it); an InsP₃
-      call needs an InsP₄ pocket score more than 2 points lower.</p>`;
+    <p class="small mute">A call is specific only when the competing ligand was scored and is more than 2 points lower:
+      InsP₄ for an InsP₃ call, NAD⁺ for a cADPR call. Leave the box blank and the call stays untested (not specific).</p>`;
 
   const presence = Object.fromEntries($$('#app input[id^="sp-"]').map(el => [el.id.slice(3), el.checked]));
   const ph = S.classifyDistribution(presence);

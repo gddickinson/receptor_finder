@@ -266,3 +266,32 @@ class TestLigandLibrary(unittest.TestCase):
         for name in ("InsP3", "InsP4"):
             self.assertNotIn("O1", LigandLibrary.LIGANDS[name], name)
             self.assertNotIn("N", LigandLibrary.LIGANDS[name], name)
+
+
+class TestPocketSpecificityCadpr(unittest.TestCase):
+    """A cADPR call must be tested against NAD+ like an InsP3 call is against InsP4 (the docstring's rule), not assumed."""
+
+    def _pocket(self):
+        from binding_pocket import BindingPocket
+        return BindingPocket(pocket_id="P", protein_id="X", volume=250.0, depth=6.0, charge=1.0, hydrophobicity=0.3,
+                             residues=[])
+
+    def test_untested_cadpr_call_is_not_specific(self):
+        from binding_pocket import PocketCharacterizer
+        a = PocketCharacterizer.assess_specificity(self._pocket(), insp3_score=3.0, cadpr_score=8.0)
+        self.assertEqual(a["primary_ligand"], "cADPR")
+        self.assertFalse(a["is_specific"])
+        self.assertIsNone(a["specificity_ratio"])
+
+    def test_cadpr_against_nad(self):
+        from binding_pocket import PocketCharacterizer
+        a = PocketCharacterizer.assess_specificity(self._pocket(), 3.0, 8.0, nad_score=5.0)
+        self.assertTrue(a["is_specific"])
+        self.assertAlmostEqual(a["specificity_ratio"], 8.0 / 5.1)
+        b = PocketCharacterizer.assess_specificity(self._pocket(), 3.0, 8.0, nad_score=6.0)  # needs > 2 points
+        self.assertFalse(b["is_specific"])
+
+    def test_insp3_rule_unchanged(self):
+        from binding_pocket import PocketCharacterizer
+        a = PocketCharacterizer.assess_specificity(self._pocket(), 9.0, 4.0, insp4_score=6.5)
+        self.assertEqual((a["primary_ligand"], a["is_specific"]), ("InsP3", True))

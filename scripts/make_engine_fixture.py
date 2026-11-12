@@ -104,10 +104,11 @@ def pocket_cases():
                           residues=list(rng.choice(names, int(rng.integers(0, 12)))))
         i3, cd = PocketScorer.score_insp3_binding(p), PocketScorer.score_cadpr_binding(p)
         i4 = [None, i3 - 3, i3 - 2, i3][k % 4]
+        nad = [None, cd - 3, cd - 2, cd, cd - 2.5][k % 5]
         out.append({"volume": p.volume, "depth": p.depth, "charge": p.charge, "hydrophobicity": p.hydrophobicity,
-                    "residues": p.residues, "insp3": i3, "cadpr": cd, "insp4": i4,
+                    "residues": p.residues, "insp3": i3, "cadpr": cd, "insp4": i4, "nad": nad,
                     "counts": [p.basic_count, p.aromatic_count, p.acidic_count, p.polar_count],
-                    "specificity": PocketCharacterizer.assess_specificity(p, i3, cd, i4)})
+                    "specificity": PocketCharacterizer.assess_specificity(p, i3, cd, i4, nad)})
     return out
 
 

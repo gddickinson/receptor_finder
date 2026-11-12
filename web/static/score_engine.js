@@ -116,14 +116,13 @@ export function scoreCadpr(p) {
 }
 
 // PocketCharacterizer.assess_specificity (pocket-score units).
-export function pocketSpecificity(insp3, cadpr, insp4 = null) {
+export function pocketSpecificity(insp3, cadpr, insp4 = null, nad = null) {
   const a = { primary_ligand: null, is_specific: false, specificity_ratio: null };
-  if (insp3 > cadpr) {
-    a.primary_ligand = 'InsP3';
-    if (insp4 !== null && insp4 !== undefined && insp3 > insp4 + 2) {
-      a.is_specific = true; a.specificity_ratio = insp3 / (insp4 + 0.1);
-    }
-  } else { a.primary_ligand = 'cADPR'; a.is_specific = true; }
+  const [own, rival] = insp3 > cadpr ? [insp3, insp4] : [cadpr, nad];
+  a.primary_ligand = insp3 > cadpr ? 'InsP3' : 'cADPR';
+  if (rival !== null && rival !== undefined && own > rival + 2) {
+    a.is_specific = true; a.specificity_ratio = own / (rival + 0.1);
+  }
   return a;
 }
 

@@ -22,7 +22,7 @@ const PHASES = [
   { n: 3, name: 'Binding pocket analysis', file: 'binding_pocket.py', input: 'Structures', steps: [
     ['Detect pockets (fpocket / P2Rank)', 'mock', 'detect_pockets returns the same three invented pockets for any file; get_fpocket_command prints the real command'],
     ['Score pockets for InsP₃ (0-13) and cADPR (0-12)', 'rule', 'PocketScorer: volume, charge, residue-class counts, depth; runs on the Scoring page'],
-    ['Specificity (InsP₃ over InsP₄)', 'rule', 'PocketCharacterizer.assess_specificity, needs an InsP₄ pocket score'],
+    ['Specificity (InsP₃ over InsP₄, cADPR over NAD⁺)', 'rule', 'PocketCharacterizer.assess_specificity, needs the competing ligand\'s pocket score'],
   ] },
   { n: 4, name: 'Molecular docking', file: 'docking.py', input: 'Top pockets', steps: [
     ['Dock InsP₃, InsP₄, cADPR with AutoDock Vina', 'mock', 'dock_ligand returns random affinities; get_vina_command prints the real command'],

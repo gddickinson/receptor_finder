@@ -25,7 +25,7 @@ for (const p of fx.pockets) {
   const c = S.residueCounts(p.residues);
   assert.deepEqual([c.basic, c.aromatic, c.acidic, c.polar], p.counts);
   close(S.scoreInsp3(p), p.insp3, 'insp3'); close(S.scoreCadpr(p), p.cadpr, 'cadpr');
-  const a = S.pocketSpecificity(p.insp3, p.cadpr, p.insp4), b = p.specificity;
+  const a = S.pocketSpecificity(p.insp3, p.cadpr, p.insp4, p.nad), b = p.specificity;
   assert.equal(a.primary_ligand, b.primary_ligand); assert.equal(a.is_specific, b.is_specific);
   if (b.specificity_ratio === null) assert.equal(a.specificity_ratio, null); else close(a.specificity_ratio, b.specificity_ratio, 'ratio');
   n++;
