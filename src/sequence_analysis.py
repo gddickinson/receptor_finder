@@ -112,14 +112,18 @@ class TransmembraneDomainPredictor:
                 start = i
                 in_tm = True
             elif hydro < threshold and in_tm:
-                # Require minimum length of 15 residues
+                # Require at least 15 consecutive windows above threshold
+                # (not 15 residues: with window=19 a run of 15 windows spans
+                # at least 33 residues). The last
+                # window above threshold starts at i - 1, so the domain's
+                # exclusive end is i - 1 + window.
                 if i - start >= 15:
-                    tm_domains.append((start, i + window))
+                    tm_domains.append((start, i - 1 + window))
                 in_tm = False
         
         # Check if still in TM at end
         if in_tm and len(hydro_profile) - start >= 15:
-            tm_domains.append((start, len(hydro_profile) + window))
+            tm_domains.append((start, len(hydro_profile) - 1 + window))
         
         # Merge nearby TM domains (within 5 residues)
         if len(tm_domains) > 1:
