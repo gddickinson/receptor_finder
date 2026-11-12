@@ -116,8 +116,9 @@ class AlphaFold2Interface:
     def _write_mock_pdb(self, filepath: str, sequence: str, plddt: np.ndarray):
         """Write mock PDB file with pLDDT in B-factor column."""
         with open(filepath, 'w') as f:
-            f.write("HEADER    PREDICTED STRUCTURE\n")
-            f.write(f"TITLE     AlphaFold2 PREDICTION\n")
+            f.write("HEADER    PLACEHOLDER STRUCTURE\n")
+            f.write("TITLE     PLACEHOLDER - NOT AN ALPHAFOLD2 PREDICTION "
+                    "(STRAIGHT CA TRACE, SIMULATED PLDDT)\n")
             
             for i, (aa, score) in enumerate(zip(sequence, plddt)):
                 # Simplified PDB ATOM record
