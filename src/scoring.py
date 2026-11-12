@@ -331,7 +331,8 @@ class LocalizationScorer:
         score : float
             Score 0-10
         """
-        return LocalizationScorer.LOCALIZATION_SCORES.get(predicted_location.lower(), 0.0)
+        table = {k.lower(): v for k, v in LocalizationScorer.LOCALIZATION_SCORES.items()}
+        return table.get(predicted_location.lower(), 0.0)
     
     @staticmethod
     def score_signal_peptide(has_signal: bool,

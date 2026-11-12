@@ -70,3 +70,18 @@ class TestMockStructureIsLabelled(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestLocalizationCase(unittest.TestCase):
+    """score_localization lower-cases its input, so mixed-case keys must still match."""
+
+    def test_er_scores_nine(self):
+        from scoring import LocalizationScorer
+        for name in ("ER", "er", "Er"):
+            self.assertEqual(LocalizationScorer.score_localization(name), 9.0)
+
+    def test_other_keys_unchanged(self):
+        from scoring import LocalizationScorer
+        self.assertEqual(LocalizationScorer.score_localization("Tonoplast"), 10.0)
+        self.assertEqual(LocalizationScorer.score_localization("plasma_membrane"), 6.0)
+        self.assertEqual(LocalizationScorer.score_localization("unknown"), 0.0)
