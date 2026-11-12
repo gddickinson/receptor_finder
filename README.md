@@ -122,6 +122,32 @@ ranker = CandidateRanker()
 ranked = ranker.rank_candidates()
 ```
 
+## Web interface
+
+A browser interface to the method and to the parts of the toolkit that are real code: the sequence filter
+(Kyte-Doolittle TM prediction, motif scanning, length / TM-count filter), the 100-point scoring rubric, the pocket
+rules, the phylogenetic pattern classifier and an evidence audit of what those rules can and cannot detect.
+The repository holds no proteome search results or candidate lists, so the site shows none; the committed
+structures and the docking and pocket-detection steps are placeholders and are labelled as such.
+
+Static site (GitHub Pages): https://gddickinson.github.io/receptor_finder/ (the filters and scoring run in your
+browser as JavaScript ports of the Python, checked case by case against it in the test suite).
+
+Run the web app locally (filters and scoring run through the Python code; nothing calls an external service):
+
+```bash
+pip install -r requirements-web.txt
+python run_web.py            # http://127.0.0.1:8206
+python -m pytest -q tests    # includes tests/test_web.py and the node tests of the JS engines
+python scripts/build_static.py --out site
+```
+
+| Home | Sequence filter |
+|---|---|
+| ![Home](docs/img/home.png) | ![Sequence filter](docs/img/sequence.png) |
+| **Scoring** | **Audit** |
+| ![Scoring](docs/img/scoring.png) | ![Audit](docs/img/audit.png) |
+
 ## Project Structure
 
 ```
@@ -132,9 +158,10 @@ receptor_finder/
 │   ├── binding_pocket.py         # Pocket detection and scoring
 │   ├── docking.py                # Molecular docking
 │   ├── scoring.py                # Multi-criteria ranking
-│   ├── phylogenetics.py          # (Future: phylogenetic analysis)
-│   ├── visualization.py          # (Future: plotting tools)
+│   ├── phylogenetics.py          # Phylogenetic distribution patterns
+│   ├── visualization.py          # Plotting tools
 │   └── utils.py                  # Utility functions
+├── web/                          # Web interface (FastAPI app + static front end)
 ├── data/                         # Data files
 │   └── example_sequences.fasta   # Example protein sequences
 ├── structures/                   # Predicted structures
@@ -232,6 +259,8 @@ receptor_finder/
 
 ## Scoring Examples
 
+*Illustrative: hypothetical proteins and hand-written scores showing the format, not output of the pipeline.*
+
 ### High-Priority Candidate
 
 ```
@@ -319,6 +348,8 @@ vina --receptor protein.pdbqt --ligand InsP3.pdbqt \
 
 ## Expected Results
 
+*Projections for a full run; the repository does not yet contain results from one.*
+
 Running the complete pipeline on Arabidopsis proteome (~30,000 proteins):
 
 1. **Initial filtering**: ~500 candidates (2% of proteome)
@@ -385,7 +416,6 @@ Planned features:
 - Automated phylogenetic analysis
 - Expression data integration
 - Batch processing pipeline
-- Web interface
 - Pre-computed results database
 
 ---

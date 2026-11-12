@@ -1,0 +1,32 @@
+/* Project accents (chlorophyll green / calcium amber / violet) and page styles for Receptor Finder. Shared theme: style.css. */
+:root { --accent:#5cf2a4; --accent2:#ffcf4a; --accent3:#c58cff; --glow:rgba(92,242,164,.13); }
+button, .btn { color:#02140b; }
+.seg button.on { color:#02140b; }
+main:focus, main:focus-visible { outline:none; }
+.plot { width:100%; height:auto; display:block; font:11px var(--mono); }
+.plot text { fill:var(--mute); }
+.plot .grid-l { stroke:var(--line); stroke-width:.7; }
+.plot .thr { stroke:var(--accent2); stroke-dasharray:4 3; stroke-width:1; }
+.plot .prof { fill:none; stroke:var(--accent); stroke-width:1.4; }
+.plot .tmband { fill:color-mix(in srgb, var(--accent) 16%, transparent); }
+.badge { display:inline-block; font:600 11px var(--mono); letter-spacing:.06em; padding:1px 7px; border-radius:3px; }
+.badge.ok { color:#02140b; background:var(--good); } .badge.no { color:#1a0505; background:var(--bad); }
+.badge.warn { color:#1a1000; background:var(--accent2); } .badge.info { color:#02140b; background:var(--accent3); }
+.seqmap { font:12px/1.5 var(--mono); word-break:break-all; background:rgba(3,5,10,.9); border:1px solid var(--line);
+  padding:10px; border-radius:4px; }
+.seqmap .tm { background:color-mix(in srgb, var(--accent) 28%, transparent); color:var(--ink); }
+.seqmap .mf { text-decoration:underline; text-decoration-color:var(--accent2); text-underline-offset:3px; }
+.bar { height:8px; background:rgba(255,255,255,.06); border-radius:4px; overflow:hidden; min-width:60px; }
+.bar i { display:block; height:100%; background:var(--accent); }
+.total { font:600 44px var(--mono); }
+.pipe { counter-reset:ph; display:grid; gap:10px; }
+.pipe .panel { margin:0; }
+.check { display:flex; gap:8px; align-items:center; font-size:14px; color:var(--ink); margin:6px 0; }
+.check input { margin:0; }
+td.num, th.num { text-align:right; font-family:var(--mono); white-space:nowrap; }
+.wrapcode { word-break:break-all; }
+@media (max-width:700px) { .two, .three, .side { grid-template-columns:1fr; } .total { font-size:34px; } }
+.side > *, .two > *, .row > * { min-width:0; }
+.pipe td, .pipe th { overflow-wrap:anywhere; }
+th { white-space:normal; }
+@media (max-width:700px) { .pipe td:first-child { min-width:8em; } }

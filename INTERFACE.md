@@ -38,8 +38,8 @@
 
 - `scoring.py`
   - `CandidateScore` (dataclass): 100-point multi-criteria score
-  - `StructuralScorer`, `EvolutionaryScorer`, `ExpressionScorer`,
-    `LocalizationScorer`, `TopologyScorer`: individual scoring functions
+  - `StructuralScorer`, `EvolutionaryScorer` (`PATTERN_SCORES`), `ExpressionScorer`,
+    `LocalizationScorer` (`LOCALIZATION_SCORES`, `SIGNAL_TYPE_SCORES`), `TopologyScorer`: individual scoring functions
   - `CandidateRanker`: rank, filter, export to DataFrame/CSV
 
 - `phylogenetics.py`
@@ -60,10 +60,30 @@
 - `check_dependencies.py` -- Verifies required packages are installed
 - `gui_app.py` -- `ReceptorFinderGUI`: 5-tab Tkinter interface
 
+## Web interface: `web/`
+- `run_web.py` (repo root) -- starts the FastAPI app on http://127.0.0.1:8206
+- `web/app.py` -- routes under /api (`/info`, `/motifs`, `/scoring`, `/examples`, `/files`, `/audit`; POST `/analyse`,
+  `/score` run the src/ code) and `STATIC_ENDPOINTS` for the static export. No route calls an external service.
+- `web/repo_data.py` -- read-only facts from src/ and committed files (motifs, defaults, scoring tables, ligand checks,
+  `FILE_STATUS` describing every committed data/output file)
+- `web/audit.py` -- benchmarks of the shipped rules (EF-hand loops, shortest TM run, phylogeny reachability)
+- `web/static/` -- ES-module front end: `main.js` (router), pages `home.js`, `method.js`, `sequence.js` (+ `seq_view.js`),
+  `scoring.js`, `audit.js`, `about.js`; `static_api.js` answers api() on the static site
+  - `seq_engine.js` -- JS port of sequence_analysis.py (KD profile in numpy's summation order, TM domains, motifs, FASTA, filter)
+  - `score_engine.js` -- JS port of the scoring.py scorers, PocketScorer, classify_distribution, docking specificity
+  - `*.test.mjs` -- node tests replaying `tests/fixtures/engine_fixture.json`
+- `scripts/make_engine_fixture.py` -- writes the Python-vs-JS fixture; `scripts/build_static.py` -- exports the static
+  site; `scripts/screenshots.py` -- browser smoke test / README images
+- `.github/workflows/pages.yml` -- tests, builds and publishes the static site on push to main
+
 ## `tests/`
 - `test_scoring.py` -- Score ranges, priority thresholds, ranking
 - `test_sequence_analysis.py` -- TM prediction, motif scanning, FASTA I/O
 - `test_utils.py` -- FASTA/PDB helpers and validation
+- `test_regressions.py` -- regression tests for bugs fixed 2026-11-12 (TM ends, ranking field, placeholder PDB label,
+  ER localization, docking score direction)
+- `test_engine_fixture.py` -- the JS-vs-Python fixture is current
+- `test_web.py` -- API, static build, JS engine node tests, audit numbers, no network calls
 
 ## Pipeline Flow
 1. `sequence_analysis` -- Filter proteome for TM proteins with relevant motifs
