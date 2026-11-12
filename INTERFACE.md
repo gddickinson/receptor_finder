@@ -5,15 +5,16 @@
 - `requirements.txt` -- Pinned pip dependencies
 - `pyproject.toml` -- Modern packaging configuration
 - `README.md` -- Project documentation
+- `THIRD_PARTY.md` -- sources, retrieval dates and licences of PROSITE, UniProt and PubChem data used
 
 ## Package: `src/`
 
 ### Core Pipeline Modules
 - `sequence_analysis.py`
   - `ProteinSequence` (dataclass): sequence + annotations
-  - `TransmembraneDomainPredictor`: hydrophobicity-based TM prediction
+  - `TransmembraneDomainPredictor`: Kyte-Doolittle TM prediction (window 19, threshold 1.6; configurable)
   - `SequenceFilter`: filter by length, TM domains, motifs
-  - `MotifScanner`: regex motif scanning for Ca2+ channel signatures
+  - `MotifScanner`: regex motif scanning (EF_hand = PROSITE PS00018)
   - `SequenceDatabase`: FASTA I/O and database operations
 
 - `structure_prediction.py`
@@ -31,16 +32,18 @@
 
 - `docking.py`
   - `DockingResult` (dataclass): affinity + interactions
-  - `LigandLibrary`: SMILES for InsP3, cADPR, InsP4, etc.
+  - `LigandLibrary`: PubChem SMILES for InsP3, InsP4, cADPR, NAADP, NAD+, 8-NH2-cADPR (`LIGAND_SOURCES`)
   - `AutoDockVinaInterface`: dock_ligand, prepare_receptor
   - `DockingAnalyzer`: compare_ligands, assess_specificity
   - `DockingDatabase`: result collection
 
 - `scoring.py`
   - `CandidateScore` (dataclass): 100-point multi-criteria score
+  - `CandidateRanker`: rank, filter, export to DataFrame/CSV
+  - re-exports the scorers below
+- `scorers.py`
   - `StructuralScorer`, `EvolutionaryScorer` (`PATTERN_SCORES`), `ExpressionScorer`,
     `LocalizationScorer` (`LOCALIZATION_SCORES`, `SIGNAL_TYPE_SCORES`), `TopologyScorer`: individual scoring functions
-  - `CandidateRanker`: rank, filter, export to DataFrame/CSV
 
 - `phylogenetics.py`
   - `GeneFamily` (dataclass): copy numbers across species
@@ -58,7 +61,10 @@
   - `validate_fasta()`, `validate_pdb()`, `validate_pdbqt()`: file validation
 
 - `check_dependencies.py` -- Verifies required packages are installed
-- `gui_app.py` -- `ReceptorFinderGUI`: 5-tab Tkinter interface
+- `gui_app.py` -- `ReceptorFinderGUI`: 6-tab Tkinter interface (state + `main()`), built from three mixins:
+  - `gui_tabs.py` -- `GuiTabsMixin`: menu bar and tab layouts
+  - `gui_actions_analysis.py` -- `GuiAnalysisMixin`: sequence, structure and pocket actions
+  - `gui_actions_results.py` -- `GuiResultsMixin`: docking, scoring, plots, help dialogs
 
 ## Web interface: `web/`
 - `run_web.py` (repo root) -- starts the FastAPI app on http://127.0.0.1:8206

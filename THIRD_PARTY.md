@@ -27,7 +27,7 @@ contacts these services.
 Fetched once on 2026-11-12 with the PUG REST API,
 `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/<name>/property/Title,MolecularFormula,SMILES,ConnectivitySMILES/JSON`.
 The library uses PubChem's isomeric `SMILES` (stereochemistry matters for docking); the canonical connectivity SMILES
-is listed for reference. PubChem data is public domain (https://pubchemdocs.ncbi.nlm.nih.gov/downloads).
+is listed for reference. PubChem data-use policy: https://www.ncbi.nlm.nih.gov/home/about/policies/.
 
 | Ligand | Query name | CID | PubChem title | Formula | Canonical (connectivity) SMILES |
 |---|---|---|---|---|---|

@@ -12,7 +12,7 @@ Modules:
 - binding_pocket: Binding pocket detection and characterization
 - docking: Molecular docking simulations
 - phylogenetics: Phylogenetic analysis and evolutionary patterns
-- scoring: Multi-criteria candidate ranking
+- scoring: Multi-criteria candidate ranking (scorers: the individual scoring rules)
 - visualization: Plotting and visualization tools
 - utils: Utility functions and helpers
 
